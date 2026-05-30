@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #040D0F;
+  color: #C5EAF4;
+  font-family: 'DM Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #0B2127; }
+::-webkit-scrollbar-thumb { background: #2A7A9E; border-radius: 2px; }
+
+/* Prose overrides for markdown */
+.prose pre {
+  background: #0B2127 !important;
+  border: 1px solid #1A526B;
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+}
+.prose code {
+  background: #0B2127;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85em;
+  color: #4FA8C9;
+}
+.prose table { border-collapse: collapse; width: 100%; }
+.prose th { background: #0F3040; padding: 8px 12px; text-align: left; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #8CCFE3; }
+.prose td { padding: 8px 12px; border-bottom: 1px solid #0B2127; font-size: 0.9rem; }
+.prose tr:hover td { background: #071419; }
