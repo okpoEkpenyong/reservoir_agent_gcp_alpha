@@ -82,7 +82,7 @@ pip install -r requirements.txt
 
 # 2. Set environment variables
 cp .env.example .env
-# Add GOOGLE_API_KEY from https://aistudio.google.com
+# Add GOOGLE_API_KEY from https://aistudio.google.com . Free subscription available
 
 # 3. Start the A2A Reporting Agent server
 uvicorn serve_reporting:app --host localhost --port 8001
