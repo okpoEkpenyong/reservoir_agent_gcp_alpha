@@ -6,6 +6,12 @@
   color-scheme: dark;
 }
 
+@layer base {
+  body {
+    @apply bg-petroleum-950 text-petroleum-100;
+  }
+}
+
 * { box-sizing: border-box; }
 
 body {

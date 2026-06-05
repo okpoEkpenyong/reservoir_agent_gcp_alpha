@@ -1,19 +1,26 @@
-/* const BASE = import.meta.env.VITE_API_URL ?? '' */
+// src/services/api.ts
 
-const BASE = 'http://localhost:8001';
+//const BASE = 'http://localhost:8001';
+const isProd = import.meta.env.production;
+// In production, use empty string (relative). In dev, use 8001.
+const BASE = isProd ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:8001');
 
 export interface ChatResponse {
   response: string;
   session_id: string;
+  model_id: string;
 }
 
-export async function sendChatMessage(prompt: string, sessionId?: string): Promise<ChatResponse> {
+export async function sendChatMessage(
+  prompt: string, 
+  modelId: string = "gemini-2.5-flash",
+  signal?: AbortSignal,
+  sessionId?: string): Promise<ChatResponse> {
   // Use URLSearchParams to send as application/x-www-form-urlencoded
   const params = new URLSearchParams();
   params.append('prompt', prompt);
-  if (sessionId) {
-    params.append('session_id', sessionId);
-  }
+  params.append('model_id', modelId); // Send to backend
+  if (sessionId) params.append('session_id', sessionId);
 
   const response = await fetch(`${BASE}/api/chat`, {
     method: 'POST',
@@ -22,43 +29,34 @@ export async function sendChatMessage(prompt: string, sessionId?: string): Promi
       'Accept': 'application/json',
     },
     body: params,
+	signal: signal, // Connects the signal to the fetch request
   });
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail?.[0]?.msg || 'Failed to communicate with reservoir agent');
+    throw new Error(errorData.detail || 'Failed to communicate with reservoir agent');
   }
 
   return response.json();
 }
 
 
-
-export async function* streamMessage(
-  message: string,
-  sessionId?: string
-): AsyncGenerator<{ type: string; text?: string; final?: boolean; author?: string; session_id?: string }> {
-  const res = await fetch(`${BASE}/api/chat/stream`, {
+export async function runBulkDCA(productionData: any[], econLimit: number) {
+  const response = await fetch(`${BASE}/api/tools/asset-analysis`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, session_id: sessionId }),
-  })
-  if (!res.ok) throw new Error(`Stream error ${res.status}`)
-  const reader = res.body!.getReader()
-  const decoder = new TextDecoder()
-  let buffer = ''
-  while (true) {
-    const { done, value } = await reader.read()
-    if (done) break
-    buffer += decoder.decode(value, { stream: true })
-    const lines = buffer.split('\n')
-    buffer = lines.pop() ?? ''
-    for (const line of lines) {
-      if (line.startsWith('data: ')) {
-        try { yield JSON.parse(line.slice(6)) } catch {}
-      }
-    }
-  }
+	//headers: {
+    //  'Content-Type': 'application/x-www-form-urlencoded',
+    //  'Accept': 'application/json',
+    //},
+	
+    body: JSON.stringify({
+      records: productionData,
+      econ_limit: econLimit
+    }),
+  });
+  if (!response.ok) throw new Error('DCA Analysis Failed');
+  return response.json();
 }
 
 export async function getInfo() {

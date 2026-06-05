@@ -1,0 +1,69 @@
+version: '3.9'
+
+services:
+  backend:
+    build:
+      context: .  # Backend is in the root
+      dockerfile: Dockerfile
+    container_name: exzing-backend
+    ports:
+      - "8001:8001"
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GOOGLE_GENAI_USE_VERTEXAI=${GOOGLE_GENAI_USE_VERTEXAI:-True}
+      - GOOGLE_CLOUD_PROJECT=${GOOGLE_CLOUD_PROJECT:-}
+      - GOOGLE_CLOUD_LOCATION=${GOOGLE_CLOUD_LOCATION:-us-central1}
+      - REPORTING_AGENT_URL=http://reporting:8007  # Internal Docker DNS
+      - OPENROUTER_OPENAI_KEY=${OPENROUTER_OPENAI_KEY:-}
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY:-}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - CONTENT_SAFETY_KEY=${CONTENT_SAFETY_KEY:-}
+      - AZURE_OPENAI_KEY=${AZURE_OPENAI_KEY:-}
+      - AZURE_OPENAI_ENDPOINT_URL=${AZURE_OPENAI_ENDPOINT_URL:-}
+      
+      
+    depends_on:
+      - reporting
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - exzing
+
+  reporting:
+    build:
+      context: .  # Changed from ./backend (since files are in root)
+      dockerfile: Dockerfile
+    container_name: exzing-reporting
+    # We override the CMD to run the reporting app instead of the main app
+    command: ["uvicorn", "serve_reporting:app", "--host", "0.0.0.0", "--port", "8007"]
+    ports:
+      - "8007:8007" # CHANGED: Host 8007 -> Container 8007 (8001 was taken)
+    environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GOOGLE_GENAI_USE_VERTEXAI=${GOOGLE_GENAI_USE_VERTEXAI:-True}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8007/.well-known/agent.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - exzing
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: exzing-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend # CHANGED: Points to the service defined above
+    networks:
+      - exzing
+
+networks:
+  exzing:
+    driver: bridge

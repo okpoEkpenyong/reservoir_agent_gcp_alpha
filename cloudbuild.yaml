@@ -5,7 +5,7 @@
 substitutions:
   _REGION: us-central1
   _SERVICE: exzing-reservoir-agent
-  _REPO: exzing-reservoir
+  _REPO: reservoir-agent-gcp-alpha
   _IMAGE: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_SERVICE}
 
 steps:
@@ -45,16 +45,19 @@ steps:
       - --cpu=2
       - --min-instances=0               # Scale to zero when idle (cost control)
       - --max-instances=10
-      - --port=8080
+      - --port=8001
       - --timeout=300
       # Secrets injected from Secret Manager at runtime
       - --set-secrets=GOOGLE_API_KEY=exzing-gemini-key:latest
       - --set-secrets=GROQ_API_KEY=exzing-groq-key:latest
       - --set-secrets=AZURE_OPENAI_KEY=exzing-azure-key:latest
+      - --set-secrets=OPENROUTER_OPENAI_KEY=exzing-openrouter-key:latest
+      - --set-secrets=AZURE_OPENAI_API_KEY=exzing-litellm-azure-keyS:latest
       - --set-secrets=CONTENT_SAFETY_KEY=exzing-content-safety-key:latest
       - --set-env-vars=GOOGLE_PROJECT_ID=${PROJECT_ID}
       - --set-env-vars=GOOGLE_LOCATION=${_REGION}
-      - --set-env-vars=GEMINI_MODEL=gemini-2.0-flash-001
+      - --set-env-vars=GEMINI_MODEL=gemini-2.5-flash
+      
     waitFor: [push]
 
 # ── Image artifacts ───────────────────────────────────────────────────────────

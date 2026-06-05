@@ -15,10 +15,12 @@ export interface Message {
 }
 
 export function useChat() {
+  const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash');	
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null) 
 
   const sendMessage = async (text: string) => {
     const userMsg: Message = {
@@ -31,9 +33,12 @@ export function useChat() {
     setMessages(prev => [...prev, userMsg]);
     setLoading(true);
     setError(null);
+	
+	const controller = new AbortController()
+    abortControllerRef.current = controller
 
     try {
-      const data = await sendChatMessage(text, sessionId);
+      const data = await sendChatMessage(text, selectedModel, controller.signal, sessionId)
       
       // Update session ID from the first response
       if (!sessionId) setSessionId(data.session_id);
@@ -47,9 +52,14 @@ export function useChat() {
 
       setMessages(prev => [...prev, assistantMsg]);
     } catch (err: any) {
-      setError(err.message || 'Connection lost. Check if backend is running on :8001');
+	  if (err.name === 'AbortError') {
+        setError(null); // Clean up the UI on manual stop
+      } else {	  
+        setError(err.message || 'Connection lost.');
+      }
     } finally {
       setLoading(false);
+	  abortControllerRef.current = null
     }
   };
 
@@ -57,86 +67,15 @@ export function useChat() {
     setMessages([]);
     setSessionId(undefined);
   };
-
-  return { messages, loading, error, sendMessage, clearChat };
-}
-
-
-/*
-export function useChatStream() {
-  const [session, setSession] = useState<ChatSession>({isStreaming
-    id: uid(), messages: [], createdAt: new Date(),
-  })
   
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const sessionIdRef = useRef<string | undefined>(undefined)
-
-  const send = useCallback(async (content: string) => {
-    if (!content.trim() || loading) return
-    setError(null)
-
-    const userMsg: Message = {
-      id: uid(), role: 'user', content, timestamp: new Date(),
-    }
-    const assistantMsg: Message = {
-      id: uid(), role: 'assistant', content: '', timestamp: new Date(), : true,
-    }
-
-    setSession(s => ({ ...s, messages: [...s.messages, userMsg, assistantMsg] }))
-    setLoading(true)
-
-    try {
-      let accumulated = ''
-      let agentUsed: string | undefined
-
-      for await (const event of streamMessage(content, sessionIdRef.current)) {
-        if (event.type === 'start' && event.session_id) {
-          sessionIdRef.current = event.session_id
-        }
-        if (event.type === 'token' && event.text) {
-          accumulated += event.text
-          if (event.author) agentUsed = event.author
-          setSession(s => ({
-            ...s,
-            messages: s.messages.map(m =>
-              m.id === assistantMsg.id
-                ? { ...m, content: accumulated, agentUsed, isStreaming: !event.final }
-                : m
-            ),
-          }))
-        }
-        if (event.type === 'done') {
-          setSession(s => ({
-            ...s,
-            messages: s.messages.map(m =>
-              m.id === assistantMsg.id ? { ...m, isStreaming: false } : m
-            ),
-          }))
-        }
-      }
-    } catch (err: any) {
-      setError(err.message ?? 'Unknown error')
-      setSession(s => ({
-        ...s,
-        messages: s.messages.map(m =>
-          m.id === assistantMsg.id
-            ? { ...m, content: '⚠️ Error reaching the agent. Check your backend is running.', isStreaming: false }
-            : m
-        ),
-      }))
-    } finally {
+   // function to expose to the UI
+  const stopGenerating = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
       setLoading(false)
     }
-  }, [loading])
+  }
 
-  const clear = useCallback(() => {
-    sessionIdRef.current = undefined
-    setSession({ id: uid(), messages: [], createdAt: new Date() })
-    setError(null)
-  }, [])
-
-  return { session, loading, error, send, clear }
+  return { messages, loading, error, sendMessage, clearChat, selectedModel, setSelectedModel, stopGenerating };
 }
 
-*/

@@ -21,6 +21,14 @@ from google.adk import Agent
 from agents.simulation_qc.agent import simulation_qc_agent
 from agents.production_analyst.agent import production_analyst_agent
 
+from tools.reservoir_tools import bulk_dca_analysis, qc_eclipse_deck, generate_swof_table
+
+# Attach tools to the specialized sub-agents
+# This ensures that when 'Production Analyst' is called, it can use the DCA tool
+production_analyst_agent.tools = [bulk_dca_analysis]
+simulation_qc_agent.tools = [qc_eclipse_deck]
+production_analyst_agent.tools = [generate_swof_table] # Or shared among tools
+
 # ── Remote Reporting Agent (A2A consumer) ─────────────────────────────────────
 # Points to the A2A server running the ReportingAgent.
 # Locally: http://localhost:8007

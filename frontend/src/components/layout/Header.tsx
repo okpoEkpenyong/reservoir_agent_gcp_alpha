@@ -3,7 +3,7 @@ import { Layers, ExternalLink } from 'lucide-react'
 export function Header() {
   return (
     <header className="h-12 flex-shrink-0 flex items-center justify-between px-6
-      border-b border-petroleum-800 bg-petroleum-950">
+      border-b border-petroleum-800 bg-petroleum-50">
       <div className="flex items-center gap-2">
         <Layers size={16} className="text-petroleum-400" />
         <span className="text-sm font-mono text-petroleum-300">

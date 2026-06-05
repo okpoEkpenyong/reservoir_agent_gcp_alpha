@@ -10,17 +10,17 @@ export default {
       },
       colors: {
         petroleum: {
-          950: '#040D0F',
-          900: '#071419',
-          800: '#0B2127',
-          700: '#0F3040',
-          600: '#144055',
-          500: '#1A526B',
-          400: '#2A7A9E',
-          300: '#4FA8C9',
-          200: '#8CCFE3',
-          100: '#C5EAF4',
-          50:  '#EBF7FC',
+          50:  '#E8F4FD', // Lightest (use for backgrounds in light mode)
+          100: '#D0E9F8',
+          200: '#B8DCF4',
+          300: '#8FCAEE',
+          400: '#60B0E6',
+          500: '#2E95DB', // Brand color
+          600: '#0D5FA3',
+          700: '#0A4A80',
+          800: '#072F55',
+          900: '#041D35', 
+          950: '#020E1A', // Darkest (use for App background)
         },
         amber: {
           950: '#1C0A00',
