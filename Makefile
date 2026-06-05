@@ -55,13 +55,12 @@ up:
 down:
 	docker-compose down
 		
-
+	
 build-ui:
 	@echo "→ Building React Frontend..."
 	cd frontend && npm run build
-	@echo "→ Preparing static assets..."
-	rm -rf ./static
-	cp -r frontend/dist ./static
+	@echo "→ Moving assets to static folder..."
+	python -c "import shutil, os; shutil.rmtree('static', ignore_errors=True); shutil.copytree('frontend/dist', 'static')"	
 
 deploy-all: build-ui
 	@echo "→ Deploying to Google Cloud Run..."
