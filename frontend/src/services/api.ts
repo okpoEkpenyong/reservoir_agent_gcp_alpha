@@ -1,7 +1,7 @@
 // src/services/api.ts
 
 //const BASE = 'http://localhost:8001';
-const isProd = import.meta.env.production;
+const isProd = import.meta.env.PROD;
 // In production, use empty string (relative). In dev, use 8001.
 const BASE = isProd ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:8001');
 
