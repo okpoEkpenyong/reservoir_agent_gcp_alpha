@@ -17,7 +17,6 @@ steps:
       - --tag=${_IMAGE}:${SHORT_SHA}
       - --tag=${_IMAGE}:latest
       - --cache-from=${_IMAGE}:latest
-      - --build-arg=BUILD_DATE=${BUILD_DATE}
       - .
 
   # ── 2. Push to Artifact Registry ─────────────────────────────────────────
