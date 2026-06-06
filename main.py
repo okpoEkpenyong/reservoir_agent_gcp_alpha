@@ -54,7 +54,7 @@ from google.adk.models.lite_llm import LiteLlm
 import json
 from os import getenv
 from typing import Annotated, Any
-
+from fastapi import APIRouter
 from tools.reservoir_tools import bulk_dca_analysis, qc_eclipse_deck, generate_swof_table
 
 # Verify the key is loaded (for debugging - remove later)
@@ -97,7 +97,7 @@ app: FastAPI = get_fast_api_app(
     agents_dir=AGENT_DIR,
     session_service_uri=SESSION_SERVICE_URI,
     allow_origins=ALLOWED_ORIGINS,
-    web=True,
+    web=False,  # Disable the built-in ADK UI by setting to False for Production builds
 )
 
 # ── Custom API logic for Frontend ───────────────────────────────────────────
@@ -246,11 +246,6 @@ async def chat(
     )
 
 
-from fastapi import APIRouter, HTTPException
-from tools.reservoir_tools import bulk_dca_analysis
-
-
-#router = APIRouter()
 
 @app.post("/api/tools/asset-analysis", response_model=AssetAnalysisResponse)
 async def analyze_asset_production(request: AssetAnalysisRequest):

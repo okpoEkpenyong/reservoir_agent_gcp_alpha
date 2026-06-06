@@ -1760,6 +1760,11 @@ object-hash@^3.0.0:
   resolved "https://registry.npmjs.org/object-hash/-/object-hash-3.0.0.tgz"
   integrity sha512-RSn9F68PjH9HqtltsSnqYC1XXoWe9Bju5+213R98cNGttag9q9yAOTzdbsqvIa7aNm5WffBZFpWYr2aWrklWAw==
 
+papaparse@^5.5.3:
+  version "5.5.3"
+  resolved "https://registry.npmjs.org/papaparse/-/papaparse-5.5.3.tgz"
+  integrity sha512-5QvjGxYVjxO59MGU2lHVYpRWBBtKHnlIAcSe1uNFCkkptUh63NFRj0FJQm7nR67puEruUci/ZkjmEFrjCAyP4A==
+
 parse-entities@^4.0.0:
   version "4.0.2"
   resolved "https://registry.npmjs.org/parse-entities/-/parse-entities-4.0.2.tgz"
