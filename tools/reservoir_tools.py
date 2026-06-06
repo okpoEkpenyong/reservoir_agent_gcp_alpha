@@ -19,7 +19,7 @@ from scipy.optimize import curve_fit
 logger = logging.getLogger(__name__)
 
 # ── ECLIPSE keyword database ──────────────────────────────────────────────────
-# Loads from agent/data/reservoir_keywords_db_v3.json (copied from beta repo).
+# Loads from agents/data/reservoir_keywords_db_v3.json (copied from beta repo).
 # Falls back to a hardcoded subset so the tool works even before the data/
 # directory is in place — useful during initial repo setup and CI.
 
@@ -45,7 +45,7 @@ def _load_keyword_db() -> set:
     Load the full ECLIPSE / OPM keyword database from JSON.
 
     Searches two locations in order:
-      1. agent/data/reservoir_keywords_db_v3.json  (relative to repo root)
+      1. agents/data/reservoir_keywords_db_v3.json  (relative to repo root)
       2. KEYWORD_DB_PATH env var (override for Cloud Run)
       3. Fallback: hardcoded subset above
 
@@ -55,7 +55,7 @@ def _load_keyword_db() -> set:
     candidates = [
         os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "agent", "data", "reservoir_keywords_db_v3.json",
+            "agents", "data", "reservoir_keywords_db_v3.json",
         ),
         os.environ.get("KEYWORD_DB_PATH", ""),
     ]
@@ -86,7 +86,7 @@ def _load_keyword_db() -> set:
 
     logger.warning(
         "ECLIPSE keyword DB not found — using %d-keyword fallback. "
-        "Copy agent/data/reservoir_keywords_db_v3.json from the beta repo.",
+        "Copy agents/data/reservoir_keywords_db_v3.json from the beta repo.",
         len(_FALLBACK_KEYWORDS),
     )
     return _FALLBACK_KEYWORDS
