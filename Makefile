@@ -62,9 +62,11 @@ build-ui:
 	@echo "→ Moving assets to static folder..."
 	python -c "import shutil, os; shutil.rmtree('static', ignore_errors=True); shutil.copytree('frontend/dist', 'static')"	
 
+
 deploy-all: build-ui
+	@echo "→ Checking environment..."
+	@python -c "import os, sys; [sys.exit(f'ERROR: Set {v}') for v in ['GOOGLE_CLOUD_PROJECT', 'GOOGLE_CLOUD_LOCATION'] if not os.getenv(v)]"
 	@echo "→ Deploying to Google Cloud Run..."
-	@test -n "$(GOOGLE_CLOUD_PROJECT)" || (echo "ERROR: Set GOOGLE_CLOUD_PROJECT env var" && exit 1)
 	adk deploy cloud_run \
 		--project=$(GOOGLE_CLOUD_PROJECT) \
 		--region=$(GOOGLE_CLOUD_LOCATION) \

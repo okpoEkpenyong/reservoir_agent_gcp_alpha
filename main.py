@@ -38,6 +38,8 @@ load_dotenv()
 
 import uvicorn
 from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Response, UploadFile
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel
@@ -330,6 +332,30 @@ async def info():
         "zdr_policy": "Zero-Data Retention — in-memory only",
     }
 
+
+# 1. Mount the 'assets' folder so CSS and JS load correctly
+# This assumes your React build put files in 'static/assets'
+if os.path.exists("static/assets"):
+    app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
+
+# 2. Serve the React app for the root URL
+@app.get("/")
+async def serve_spa():
+    return FileResponse("static/index.html")
+
+# 3. Handle React Routing (SPA fallback)
+# This ensures that if a user refreshes the page on /chat, they don't get a 404
+@app.get("/{full_path:path}")
+async def catch_all(full_path: str):
+    # Ignore API routes and health checks
+    if full_path.startswith("api") or full_path.startswith("health"):
+        return None 
+    
+    # For everything else, serve the React index.html
+    index_path = os.path.join("static", "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"error": "Frontend not found. Did you run 'make build-ui'?"}
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8001))

@@ -1,46 +1,58 @@
-# ── Exzing Reservoir Agent — Cloud Run Dockerfile (Alpha) ────────────────────
+# ── STAGE 1: Build the React Frontend ───────────────────────────────────────
+FROM node:18-slim AS frontend-builder
+WORKDIR /build
+
+# Copy only package files first to leverage Docker cache
+COPY frontend/package*.json ./
+RUN npm install
+
+# Copy source and build
+COPY frontend/ ./
+RUN npm run build
+
+
+# ── STAGE 2: Build the Python Backend ───────────────────────────────────────
 FROM python:3.11-slim
 
+# --- RECOVERED FROM YOUR VERSION: Metadata & Env ---
 LABEL maintainer="Ekpenyong Okpo <info@exzing.com>"
 
-# Prevent Python from writing .pyc files and enable unbuffered logging
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PORT=8001 \
     GOOGLE_LOCATION=us-central1 \
-    GOOGLE_GENAI_USE_VERTEXAI=FALSE
+    GOOGLE_GENAI_USE_VERTEXAI=TRUE
 
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# Install dependencies
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Copy the application
+# Copy the Python source code
 COPY . .
 
-# Ensure the static folder exists (for the UI)
-# If you run 'make build-ui' before pushing, this is already there.
-# If not, we create an empty one so the FastAPI server doesn't crash.
-RUN mkdir -p /app/static
+# --- THE MAGIC STEP: Sync Frontend dist to Backend static ---
+# This copies the result of the Node build into the Python static folder
+COPY --from=frontend-builder /build/dist ./static
 
-# Security: Run as non-root user
+# --- RECOVERED FROM YOUR VERSION: Security ---
+# Ensure the appuser can access the newly copied static files
 RUN useradd --create-home --shell /bin/bash appuser && \
     chown -R appuser:appuser /app
 USER appuser
 
-# Healthcheck must match the port the app is listening on
+# Healthcheck (Ensure your main.py has @app.get("/health"))
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:8001/health || exit 1
 
-# EXPOSE is mainly documentation, but it should match the app port
 EXPOSE 8001
 
 # Start the application
-# We use the shell form so $PORT is correctly evaluated
 CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port $PORT"]
