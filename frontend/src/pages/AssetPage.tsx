@@ -747,7 +747,9 @@ const ResultsTable = ({ wells }: { wells: WellResult[] }) => (
 // ─────────────────────────────────────────────
 export function AssetPage() {
 
-  const { sendMessage, setSessionId, messages, loading, selectedModel } = useChat(); 
+  const { messagesByPage,sendMessage, loading, selectedModel } = useChat(); 
+  const messages = messagesByPage['asset'];
+  
   const modelDisplayName = selectedModel ? selectedModel.split(/[-( ]/)[0].toUpperCase() : 'AI';
 
   const {
@@ -843,7 +845,7 @@ export function AssetPage() {
     try {
       const data = await runBulkDCA(wellRecords, econLimit);
       setResults(data);
-      if (data.session_id && setSessionId) setSessionId(data.session_id);
+      //if (data.session_id && setSessionId) setSessionId(data.session_id);
     } catch {
       setError('DCA mathematics engine unreachable. Check your connection.');
     } finally {
@@ -851,17 +853,19 @@ export function AssetPage() {
     }
   };
 
+  //const handleAIAdvisor = () => sendMessage(prompt, 'asset'); // ← pass page key
+  
+  
   const handleAIAdvisor = () => {
-    if (!results) return;
-    const summary = results.dca_results.well_results.map(w => {
-      const eur = arpsEUR(w.qi_stbd, w.di_per_yr, w.b_factor, econLimit, forecastHorizon).toFixed(4);
-      const tta = timeToAban(w.qi_stbd, w.di_per_yr, w.b_factor, econLimit, forecastHorizon).toFixed(1);
-      return `${w.well_name}: qi=${w.qi_stbd} STB/D, Di=${w.di_per_yr}%/yr, b=${w.b_factor}, EUR=${eur} MMSTB, TTA=${tta} yr`;
-    }).join('\n');
-    sendMessage(
-      `Run AI diagnosis on DCA results (econ limit=${econLimit} STB/D, buffer=${abandonmentBuffer}×, horizon=${forecastHorizon} yr):\n${summary}\n\nInterpret each well's b-factor, flag SPE-PRMS anomalies, and provide reserve booking guidance.`
-    );
-  };
+  if (!results) return;
+  const summary = results.dca_results.well_results.map(w => {
+    const eur = arpsEUR(w.qi_stbd, w.di_per_yr, w.b_factor, econLimit, forecastHorizon).toFixed(4);
+    const tta = timeToAban(w.qi_stbd, w.di_per_yr, w.b_factor, econLimit, forecastHorizon).toFixed(1);
+    return `${w.well_name}: qi=${w.qi_stbd} STB/D, Di=${w.di_per_yr}%/yr, b=${w.b_factor}, EUR=${eur} MMSTB, TTA=${tta} yr`;
+  }).join('\n');
+  const message = `Run AI diagnosis on DCA results (econ limit=${econLimit} STB/D, buffer=${abandonmentBuffer}×, horizon=${forecastHorizon} yr):\n${summary}\n\nInterpret each well's b-factor, flag SPE-PRMS anomalies, and provide reserve booking guidance.`;
+  sendMessage(message, 'asset');
+};
   
  
   const detectedFields = [...new Set(wellRecords.map((r: any) => r.field))];

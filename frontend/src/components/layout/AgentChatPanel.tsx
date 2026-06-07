@@ -7,14 +7,24 @@ import { useChat } from '../../context/ChatContext'
 import { MessageBubble } from '../ui/MessageBubble'
 import { PromptSuggestions } from '../ui/PromptSuggestions'
 import { Message } from '../../types'
+import type { PageKey } from '../../context/ChatContext';
+
 
 export function AgentChatPanel({ isVisible }: { isVisible?: boolean }) {
-  const { messages, sendMessage, loading, selectedModel, clearChat, stopGenerating, error } = useChat();
+  const { messagesByPage, sendMessage, loading, selectedModel, clearChat, stopGenerating, error } = useChat();
   const [input, setInput] = useState("");
   const [isHistoryCollapsed, setIsHistoryCollapsed] = useState(true);
   const [hitlVerified, setHitlVerified] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  
+  const location = useLocation();
+  const pageKey = (location.pathname.replace('/', '') || 'global') as PageKey;
+  const messages = messagesByPage[pageKey];
   const isEmpty = !messages || messages.length === 0
+  
+ 
+  
+  //const handleSend = () => sendMessage(input, pageKey)
 
   // Auto-scroll to bottom on new messages
   useEffect(() => {
@@ -25,7 +35,8 @@ export function AgentChatPanel({ isVisible }: { isVisible?: boolean }) {
     if (!input.trim() || loading) return;
     const text = input;
     setInput("");
-    await sendMessage(text);
+	//const handleSend = () => sendMessage(input, pageKey)
+    await sendMessage(text, pageKey);
   };
 
   // Porting "Strategy 3": Determine which messages are "History"
@@ -60,7 +71,7 @@ export function AgentChatPanel({ isVisible }: { isVisible?: boolean }) {
         </div>
 		{!isEmpty && (
 			<div className="flex justify-end p-2 border-b border-petroleum-800/50">
-			  <button onClick={clearChat} className="flex items-center gap-1 text-[10px] font-mono text-petroleum-500 hover:text-red-400 transition-colors">
+			  <button onClick={() => clearChat(pageKey)}  className="flex items-center gap-1 text-[10px] font-mono text-petroleum-500 hover:text-red-400 transition-colors">
 				<Trash2 size={12} /> CLEAR_SESSION
 			  </button>
 			</div>

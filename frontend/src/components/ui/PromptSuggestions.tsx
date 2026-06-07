@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react';
 import { Cpu, BarChart2, FileText, GitMerge, ArrowRight } from 'lucide-react';
 
+
 const CARDS = [
   {
     icon: Cpu,
@@ -9,7 +10,7 @@ const CARDS = [
     iconColor: 'text-cyan-400',
     label: 'Simulation QC',
     sub: 'ECLIPSE · OPM',
-    path: '/debug', // Simplified path for the workspace
+    path: '/debug',
   },
   {
     icon: BarChart2,
@@ -25,49 +26,20 @@ const CARDS = [
     iconColor: 'text-emerald-400',
     label: 'Reporting Agent',
     sub: 'A2A · Board summaries',
-    path: '/chat?mode=reporting',
+    path: '/relperm',
   },
   {
-    icon: 'FileText',
+    icon: GitMerge,
     color: 'from-violet-500/20 to-violet-500/5 border-violet-500/30',
     iconColor: 'text-violet-400',
-    sub: 'Generate a SWOF ECLIPSE',
-	label: 'Generate RelPerm table', 
-    path: '/relperm',
-    },
-]
-
-
-const SUGGESTIONS = [
-  { 
-    label: 'QC a simulation deck', 
-    path: '/debug',
-    prompt: 'QC this ECLIPSE deck snippet:\n\nRUNSPEC\nDIMENZ\n10 10 3 /\nGRID\nPORO\n300*0.25 /\nPROPS\nSOLUTION\nSCHEDULE\nEND', 
-    icon: '🛠' 
-  },
-  { 
-    label: 'Analyse production decline', 
-    path: '/asset',
-    prompt: 'Run DCA on these 3 wells:\n- WELL-A: [4500,4200,3900,3600,3300,3000,2700,2400] STB/D monthly\n- WELL-B: [3000,2700,2400,2100,1800,1500,1200,900] STB/D monthly\n- WELL-C: [1500,1450,1400,1350,1300,1250,1200,1150] STB/D monthly\nEconomic limit: 50 STB/D', 
-    icon: '📈' 
-  },
-  { 
-    label: 'Generate RelPerm table', 
-    path: '/relperm',
-    prompt: 'Generate a SWOF ECLIPSE table for Niger Delta shallow marine sand. Swc=0.22, Sorw=0.18, nw=2.8, no=3.5, Krw_max=0.45, Kro_max=0.92', 
-    icon: '🧪' 
-  },
-  { 
-    label: 'Executive summary', 
-    path: '/chat', // Stays in general chat
-    prompt: 'Generate a board-ready executive summary for an asset with 3 wells, total EUR of 2.1 MMSTB, one well (WELL-C) showing b-factor of 1.2 requiring SPE-PRMS correction, and simulation QC safety score of 85%.', 
-    icon: '📋' 
+    label: 'Orchestrator',
+    sub: 'Routes all requests',
+    path: '/',
   },
 ]
 
 
-//export function PromptSuggestions({ onSelect }: { onSelect: (path: string) => void }) {
-export function PromptSuggestions({ onSelect }: { onSelect: (prompt: string, path: string) => void }) {
+export function PromptSuggestions({ onSelect }: { onSelect: (path: string) => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animRef = useRef<number>()
   
@@ -200,8 +172,8 @@ export function PromptSuggestions({ onSelect }: { onSelect: (prompt: string, pat
           const Icon = card.icon
           return (
             <button 
-              key={card.label} 
-              onClick={() => onSelect(card.label,card.path)}
+              key={card.path} 
+              onClick={() => onSelect(card.path)}
               className={`group text-left p-4 rounded-xl border bg-gradient-to-br
                 backdrop-blur-sm transition-all duration-200
                 hover:scale-[1.03] hover:brightness-110 active:scale-[0.98]

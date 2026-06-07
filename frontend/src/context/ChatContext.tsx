@@ -2,70 +2,78 @@ import React, { createContext, useContext, useState, useRef } from 'react';
 import { sendChatMessage } from '../services/api';
 import { Message } from '../types'
 
-// 1. Define a strict interface for the Context state
+export type PageKey = 'asset' | 'debug' | 'relperm' | 'global';
+
 interface ChatContextType {
-  messages: Message[];
+  // Replace flat messages with a per-page map
+  messagesByPage: Record<PageKey, Message[]>;
   loading: boolean;
   error: string | null;
   selectedModel: string;
   setSelectedModel: (m: string) => void;
-  sendMessage: (text: string) => Promise<void>;
+  sendMessage: (text: string, page: PageKey) => Promise<void>;
   stopGenerating: () => void;
-  clearChat: () => void;
-  setSessionId: (id: string | undefined) => void; 
+  clearChat: (page?: PageKey) => void; // clears one page or all
 }
-
 
 const ChatContext = createContext<ChatContextType | null>(null);
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
-  const [messages, setMessages] = useState<Message[]>([]); 
+  const [messagesByPage, setMessagesByPage] = useState<Record<PageKey, Message[]>>({
+    asset: [], debug: [], relperm: [], global: [],
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash');
-  const [sessionId, setSessionId] = useState<string | undefined>(undefined);
+  const [sessionIdsByPage, setSessionIdsByPage] = useState<Partial<Record<PageKey, string>>>({});
   const abortControllerRef = useRef<AbortController | null>(null);
 
-  const sendMessage = async (text: string) => {
+  const sendMessage = async (text: string, page: PageKey) => {
     if (!text.trim()) return;
-
     setLoading(true);
     setError(null);
 
-    // Add user message locally
-    const userMsg: Message = { 
-      id: Date.now().toString(), 
-      role: 'user', 
+    const userMsg: Message = {
+      id: Date.now().toString(),
+      role: 'user',
       content: text,
-      timestamp: new Date() 
+      timestamp: new Date(),
     };
-    
-    setMessages((prev) => [...prev, userMsg]);
+
+    setMessagesByPage(prev => ({
+      ...prev,
+      [page]: [...prev[page], userMsg],
+    }));
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
-	
+
     try {
-      const data = await sendChatMessage(text, selectedModel, controller.signal, sessionId);
-      
-      // Safety check: ensure data and response exist before updating state
+      const data = await sendChatMessage(
+        text, selectedModel, controller.signal, sessionIdsByPage[page]
+      );
+
       if (data && data.response) {
-        if (!sessionId && data.session_id) setSessionId(data.session_id);
-        
-        const assistantMsg: Message = { 
-          id: (Date.now() + 1).toString(), 
-          role: 'assistant', 
+        if (!sessionIdsByPage[page] && data.session_id) {
+          setSessionIdsByPage(prev => ({ ...prev, [page]: data.session_id }));
+        }
+
+        const assistantMsg: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
           content: data.response,
-          timestamp: new Date()
+          timestamp: new Date(),
         };
-        setMessages((prev) => [...prev, assistantMsg]);
+
+        setMessagesByPage(prev => ({
+          ...prev,
+          [page]: [...prev[page], assistantMsg],
+        }));
       } else {
-        throw new Error("Malformed response from server");
+        throw new Error('Malformed response from server');
       }
     } catch (err: any) {
-      if (err.name !== 'AbortError') {
-        setError(err.message || 'Connection error');
-      }
+      if (err.name !== 'AbortError') setError(err.message || 'Connection error');
     } finally {
       setLoading(false);
       abortControllerRef.current = null;
@@ -79,16 +87,21 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const clearChat = () => {
-    setMessages([]);
-    setSessionId(undefined);
+  const clearChat = (page?: PageKey) => {
+    if (page) {
+      setMessagesByPage(prev => ({ ...prev, [page]: [] }));
+      setSessionIdsByPage(prev => ({ ...prev, [page]: undefined }));
+    } else {
+      setMessagesByPage({ asset: [], debug: [], relperm: [], global: [] });
+      setSessionIdsByPage({});
+    }
     setError(null);
   };
 
   return (
     <ChatContext.Provider value={{
-      messages, loading, error, selectedModel, setSelectedModel, 
-      sendMessage, stopGenerating, clearChat, setSessionId 
+      messagesByPage, loading, error, selectedModel,
+      setSelectedModel, sendMessage, stopGenerating, clearChat,
     }}>
       {children}
     </ChatContext.Provider>
