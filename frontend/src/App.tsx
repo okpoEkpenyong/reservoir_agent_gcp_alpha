@@ -3,7 +3,6 @@ import { Routes, Route , useLocation, useNavigate, Navigate } from 'react-router
 import { Sidebar } from './components/layout/Sidebar'
 import { Header } from './components/layout/Header'
 import { AssetPage } from './pages/AssetPage'
-import { AgentChatPanel } from './components/layout/AgentChatPanel'
 import { LandingPage } from './pages/LandingPage'
 import { DebugPage } from './pages/DebugPage'
 import { RelPermPage } from './pages/RelPermPage'
@@ -11,12 +10,32 @@ import { useChat } from './context/ChatContext'
 import { AssetProvider } from './context/AssetContext'; 
 import { DebugProvider } from './context/DebugContext';
 
+
 export default function App() {
   const { messagesByPage, clearChat, selectedModel, setSelectedModel } = useChat()
   //const isSessionActive = messagesByPage.length > 0;
   const isSessionActive = Object.values(messagesByPage).some(msgs => msgs.length > 0);
   
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  const location = useLocation()
+
+  // Don't show sidebar/header on the landing page — it has its own full-screen layout
+  const isLanding = location.pathname === '/' || location.pathname === '/chat'
+
+  if (isLanding) {
+    return (
+      <div className="h-screen overflow-hidden bg-petroleum-950">
+	    <Header
+          sidebarOpen={sidebarOpen}
+          onToggleSidebar={() => setSidebarOpen(o => !o)}
+        />
+        <Routes>
+          <Route path="/*" element={<LandingPage />} />
+        </Routes>
+      </div>
+    )
+  }
   
   return (
     <AssetProvider>
@@ -43,7 +62,10 @@ export default function App() {
             {/* Mobile top bar */}
             <div className="lg:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-slate-200">
               <button onClick={() => setSidebarOpen(o => !o)} className="p-2 rounded-lg hover:bg-slate-100">
-                <Header />
+                <Header
+				  sidebarOpen={sidebarOpen}
+				  onToggleSidebar={() => setSidebarOpen(o => !o)}
+				/>
               </button>
               <span className="text-sm font-bold text-slate-800">Exzing Reservoir Agent</span>
             </div>
