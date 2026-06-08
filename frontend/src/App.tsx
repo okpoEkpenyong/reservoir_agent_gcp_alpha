@@ -22,17 +22,18 @@ export default function App() {
 
   // Don't show sidebar/header on the landing page — it has its own full-screen layout
   const isLanding = location.pathname === '/' || location.pathname === '/chat'
-
+  
   if (isLanding) {
     return (
       <div className="h-screen overflow-hidden bg-petroleum-950">
+        <Routes>
+          <Route path="/*" element={<LandingPage />} />
+          <Route path="/chat" element={<LandingPage />} />
+        </Routes>
 	    <Header
           sidebarOpen={sidebarOpen}
           onToggleSidebar={() => setSidebarOpen(o => !o)}
         />
-        <Routes>
-          <Route path="/*" element={<LandingPage />} />
-        </Routes>
       </div>
     )
   }
@@ -64,7 +65,7 @@ export default function App() {
               <button onClick={() => setSidebarOpen(o => !o)} className="p-2 rounded-lg hover:bg-slate-100">
                 <Header
 				  sidebarOpen={sidebarOpen}
-				  onToggleSidebar={() => setSidebarOpen(o => !o)}
+				  onToggleSidebar={() => setSidebarOpen(o => o)}
 				/>
               </button>
               <span className="text-sm font-bold text-slate-800">Exzing Reservoir Agent</span>
