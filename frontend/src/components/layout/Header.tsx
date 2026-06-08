@@ -13,13 +13,17 @@ export function Header({ sidebarOpen, onToggleSidebar }: HeaderProps) {
       {/* Left */}
       <div className="flex items-center gap-3">
         {/* Hamburger — mobile only */}
-        <button
-          onClick={onToggleSidebar}
-          className="md:hidden flex items-center justify-center w-8 h-8 rounded-lg
-            text-petroleum-400 hover:text-petroleum-200 hover:bg-petroleum-800 transition-colors"
-          aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}>
-          {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
-        </button>
+        <div
+		  role="button"
+		  tabIndex={0}
+		  onClick={onToggleSidebar}
+		  onKeyDown={e => e.key === 'Enter' && onToggleSidebar()}
+		  className="md:hidden flex items-center justify-center w-8 h-8 rounded-lg
+			text-petroleum-400 hover:text-petroleum-200 hover:bg-petroleum-800 
+			transition-colors cursor-pointer"
+		  aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}>
+		  {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
+		</div>
 
         {/* Tech stack — desktop only */}
         <div className="hidden md:flex items-center gap-2">

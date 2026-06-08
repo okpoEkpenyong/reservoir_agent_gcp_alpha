@@ -3,11 +3,11 @@ import { useLocation } from 'react-router-dom';
 import { Message } from '../types'
 import { useChat } from '../context/ChatContext';
 import { MessageBubble } from '../components/ui/MessageBubble';
-import { Zap, Cpu, Code, AlertCircle, Play, FileCode, Terminal } from 'lucide-react';
+import { Zap, Cpu, Code, AlertCircle, Play, FileCode, Terminal,FileText  } from 'lucide-react';
 import { AgentChatPanel } from '../components/layout/AgentChatPanel'
 import { useDebug } from '../context/DebugContext';
 
-
+import { AgentActionBanner } from '../components/ui/AgentActionBanner';
 
 // --- DEFAULT TEST DATA (Matches your Streamlit placeholder spirit) ---
 const EXAMPLE_DECK = `-- TEST_CASE: INCORRECT KEYWORD SYNTAX
@@ -26,6 +26,8 @@ export function DebugPage() {
   const { messagesByPage, sendMessage, loading, selectedModel } = useChat();
   const messages = messagesByPage['debug'];
 
+  const isDiagnosisComplete = messages.length > 0 && messages[messages.length - 1].role === 'assistant' && !loading;
+
   const [localError, setLocalError] = useState<string | null>(null);
 
 
@@ -43,7 +45,7 @@ export function DebugPage() {
     setErrorLog(type === 'example' ? EXAMPLE_ERROR : "");
   };
 
-  
+  // First send the initial message to the orchestrator before following up, optionally
   const handleRunDiagnosis = async () => {
     if (!deck.trim() || !errorLog.trim()) {
       setLocalError("Both the .DATA snippet and the Error Log are required.");
@@ -154,6 +156,19 @@ Fixed code should be well written in normal ECLIPSE/OPM format. You can attach a
       ) : (
         <div className="flex-1">
           <AgentChatPanel isVisible={true} />
+		      {isDiagnosisComplete && (
+				  <div className="pb-8">
+					<AgentActionBanner 
+					  title="Technical Audit Ready"
+					  description="Handoff to Reporting Agent for B2B Summary?"
+					  icon={FileText}
+					  buttonText="GENERATE EXECUTIVE SUMMARY"
+					  onAction={() => sendMessage("The diagnosis is complete. Call the reporting agent to generate an executive summary.", 'debug')}
+					  isLoading={loading}
+					  color="violet"
+					/>
+				  </div>
+				)}
         </div>
       )}
     </div>

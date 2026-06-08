@@ -68,7 +68,7 @@ export default function App() {
 				  onToggleSidebar={() => setSidebarOpen(o => o)}
 				/>
               </button>
-              <span className="text-sm font-bold text-slate-800">Exzing Reservoir Agent</span>
+              <span className="text-sm font-bold text-slate-800">Subsurface Intelligent Agent</span>
             </div>
 
             <main className="flex-1 overflow-hidden">
