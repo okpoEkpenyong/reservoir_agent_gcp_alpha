@@ -56,6 +56,7 @@ from os import getenv
 from typing import Annotated, Any
 from fastapi import APIRouter
 from tools.reservoir_tools import bulk_dca_analysis, qc_eclipse_deck, generate_swof_table
+from agents.reporting.agent import reporting_agent
 
 # Verify the key is loaded (for debugging - remove later)
 api_key = os.getenv("GOOGLE_API_KEY")
@@ -327,11 +328,16 @@ async def info():
         "zdr_policy": "Zero-Data Retention — in-memory only",
     }
 
+#  MOUNT THE REPORTING A2A AGENT ---
+# This makes the reporting agent discoverable at gcpagent.exzing.com/a2a/reporting
+from agents.reporting.agent import a2a_app
+app.mount("/a2a/reporting", a2a_app)  
 
-# 1. Mount the 'assets' folder so CSS and JS load correctly
-# This assumes your React build put files in 'static/assets'
-if os.path.exists("static/assets"):
-    app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
+
+# -- MOUNT THE REPORTING A2A AGENT ---
+# Ensure we are mounting the 'a2a_app' (the result of to_a2a), not just the agent object.
+from agents.reporting.agent import a2a_app
+app.mount("/a2a/reporting", a2a_app)
 
 # 2. Serve the React app for the root URL
 @app.get("/")
@@ -340,10 +346,15 @@ async def serve_spa():
 
 # 3. Handle React Routing (SPA fallback)
 # This ensures that if a user refreshes the page on /chat, they don't get a 404
-@app.get("/{full_path:path}")
+@app.get("/{full_path:path}", include_in_schema=False)
 async def catch_all(full_path: str):
-    # Ignore API routes and health checks
-    if full_path.startswith("api") or full_path.startswith("health"):
+    # CRITICAL: If the path starts with a2a, do NOT return index.html
+    # This allows the A2A discovery protocol to work.
+    if (full_path.startswith("api") or 
+        full_path.startswith("health") or 
+        full_path.startswith("a2a") or 
+        full_path.startswith("_adk") or
+        full_path.startswith("docs")):
         return None 
     
     # For everything else, serve the React index.html
@@ -351,7 +362,8 @@ async def catch_all(full_path: str):
     if os.path.exists(index_path):
         return FileResponse(index_path)
     return {"error": "Frontend not found. Did you run 'make build-ui'?"}
-
+    
+    
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8001))
     uvicorn.run("main:app", host="0.0.0.0", port=port, log_level="info")

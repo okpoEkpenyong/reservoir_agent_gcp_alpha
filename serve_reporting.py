@@ -2,7 +2,7 @@
 serve_reporting.py — Starts the Exzing Reporting Agent as an A2A server.
 
 Usage (local):
-    uvicorn serve_reporting:app --host localhost --port 8001
+    uvicorn serve_reporting:app --host localhost --port 8007
 
 Usage (Cloud Run):
     Set PORT env var — Cloud Run injects this automatically.
@@ -23,7 +23,7 @@ from agents.reporting.agent import a2a_app as app  # noqa: E402
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", "8001"))
+    port = int(os.getenv("PORT", "8007"))
     uvicorn.run(
         "serve_reporting:app",
         host="0.0.0.0",

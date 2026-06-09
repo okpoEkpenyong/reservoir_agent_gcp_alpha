@@ -20,34 +20,15 @@ from google.adk import Agent
 
 from agents.simulation_qc.agent import simulation_qc_agent
 from agents.production_analyst.agent import production_analyst_agent
+from agents.reporting.agent import reporting_agent
 
-from tools.reservoir_tools import bulk_dca_analysis, qc_eclipse_deck, generate_swof_table
+from tools.reservoir_tools import bulk_dca_analysis, qc_eclipse_deck, generate_swof_table, format_engineering_context
 
 # Attach tools to the specialized sub-agents
-# This ensures that when 'Production Analyst' is called, it can use the DCA tool
 production_analyst_agent.tools = [bulk_dca_analysis]
 simulation_qc_agent.tools = [qc_eclipse_deck]
 production_analyst_agent.tools = [generate_swof_table] # Or shared among tools
-
-# ── Remote Reporting Agent (A2A consumer) ─────────────────────────────────────
-# Points to the A2A server running the ReportingAgent.
-# Locally: http://localhost:8007
-# On Cloud Run: set REPORTING_AGENT_URL env var
-_reporting_agent_url = os.getenv(
-    "REPORTING_AGENT_URL",
-    "http://localhost:8007",
-)
-
-#reporting_agent_remote = RemoteA2aAgent(
-#    name="reporting_agent_remote",
-#    description=(
-#        "Remote executive reporting agent accessible via A2A protocol. "
-#        "Transforms engineering analysis results into management-ready "
-#        "executive summaries and compliance reports. "
-#        "Use for: final reports, board summaries, regulatory statements."
-#    ),
-#    agent_card=f"{_reporting_agent_url}/.well-known/agent-card.json",
-#)
+reporting_agent.tools = [format_engineering_context]
 
 # ── Root Orchestrator Agent ───────────────────────────────────────────────────
 root_agent = Agent(
@@ -84,7 +65,7 @@ You manage a team of specialist agents:
 Workflow rules:
 - For complex requests (e.g. "analyse this field and give me a board report"):
   1. Route technical analysis to the appropriate specialist agent
-  2. Pass the specialist's findings to reporting_agent_remote for the final summary
+  2. Pass the specialist's findings to reporting_agent for the final summary
 - For simple single-step requests (e.g. "QC this deck"), route directly to the
   specialist agent without calling reporting_agent_remote
 - Always confirm Human-in-the-Loop (HITL) sign-off before any output is exported
@@ -92,12 +73,12 @@ Workflow rules:
 - Maintain Zero Data Retention: remind users that no data is stored beyond this session
 
 Tone: Professional, technically precise, never condescending.
-Context: Your users are reservoir engineers and geologists at African O&G companies.
+Context: Your users are reservoir engineers and geologists at O&G companies.
          They understand technical terminology. Do not over-explain basics.
 """,
     sub_agents=[
         simulation_qc_agent,
         production_analyst_agent,
-        #reporting_agent_remote,
+        reporting_agent,
     ],
 )

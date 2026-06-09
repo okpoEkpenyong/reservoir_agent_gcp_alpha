@@ -24,6 +24,10 @@ import { AgentChatPanel } from '../components/layout/AgentChatPanel'
 import { useAsset } from '../context/AssetContext';
 import type { WellRecord } from '../context/AssetContext'; //
 
+import { AgentActionBanner } from '../components/ui/AgentActionBanner';
+
+
+
 // ─────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────
@@ -1022,6 +1026,19 @@ export function AssetPage() {
             <span className="text-xs font-bold">{error}</span>
           </div>
         )}
+		
+		// After DCA analysis is shown...
+		{results && (
+		  <AgentActionBanner 
+			title="DCA Analysis Complete"
+			description="Translate physics results into a Reserves Statement?"
+			icon={BarChart2}
+			buttonText="PREPARE RESERVES REPORT"
+			onAction={() => sendMessage("DCA results are ready. Use the reporting specialist to create an SPE-PRMS reserves statement.", 'asset')}
+			isLoading={loading}
+			color="emerald"
+		  />
+		)}
 
         {/* ── 4. RESULTS ── */}
          {results && (

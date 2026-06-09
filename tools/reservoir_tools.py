@@ -55,7 +55,7 @@ def _load_keyword_db() -> set:
     candidates = [
         os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-            "agents", "data", "reservoir_keywords_db_v3.json",
+            "..agents", "data", "reservoir_keywords_db_v3.json",
         ),
         os.environ.get("KEYWORD_DB_PATH", ""),
     ]
@@ -466,3 +466,15 @@ def format_engineering_context(
         return "No engineering data provided — please run QC, DCA, or RelPerm analysis first."
 
     return "\n\n".join(sections)
+
+
+
+# 3. Example of an A2A Trigger (Logic for your /api/chat route)
+# When the orchestrator decides it's time for a report, it "hands off" to the reporter
+async def handle_reporting_handoff(root_agent, result_summary: str):
+    # This simulates the Orchestrator calling the Reporting Agent via A2A
+    response = await root_agent.call_agent(
+        agent_name="exzing_reporting_agent",
+        message=f"Please create an executive report for these results: {result_summary}"
+    )
+    return response

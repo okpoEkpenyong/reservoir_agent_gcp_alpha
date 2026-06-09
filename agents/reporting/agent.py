@@ -11,8 +11,8 @@ reporting agent can call the Exzing Reporting Agent to transform raw
 engineering data into board-ready summaries, without requiring access
 to the full reservoir engineering workstation.
 
-Powered exclusively by Gemini 2.0 Flash.
-Exposed via: to_a2a(reporting_agent, port=8001)
+Powered exclusively by Gemini 2.5 Flash and other user-selected models.
+Exposed via: to_a2a(reporting_agent, port=8007)
 """
 
 from google.adk import Agent
@@ -24,7 +24,7 @@ from tools.reservoir_tools import format_engineering_context
 # ── Agent definition ──────────────────────────────────────────────────────────
 reporting_agent = Agent(
     name="exzing_reporting_agent",
-    model="gemini-2.5-flash",
+    model="gemini-2.5-flash", # this should be dynamically passed through a Provider coming from App.tx
     description=(
         "Exzing Executive Reporting Agent. "
         "Transforms raw reservoir engineering analysis data into "
@@ -52,7 +52,7 @@ When given engineering context (QC results, DCA data, RelPerm analysis):
 
 Tone: Professional, concise, non-technical language where possible.
 Length: Executive summary should be readable in under 3 minutes.
-Audience: Asset managers, VP Engineering, Board members, DPR regulators.
+Audience: Asset managers, VP Engineering, Board members, NUPRC regulators.
 
 Critical rules:
 - Never fabricate data. Only report what the engineering tools found.
@@ -69,7 +69,8 @@ Critical rules:
 # Explicit agent card for enterprise discovery and integration
 _agent_card = AgentCard(
     name="Exzing Executive Reporting Agent",
-    url="https://exzing-reporting-agent-<hash>-uc.a.run.app",  # update post-deploy
+    #url="https://gcpagent.exzing.com/a2a/reporting",
+    url="http://localhost:8001/a2a/reporting",
     description=(
         "Transforms reservoir engineering analysis outputs into "
         "management-ready executive summaries for African O&G operators. "
@@ -102,7 +103,7 @@ _agent_card = AgentCard(
             tags=["spe-prms", "reserves", "compliance", "nigeria", "dpr"],
             examples=[
                 "Generate a 1P reserves statement for Field-X",
-                "Prepare DPR annual production report for Block OML-123",
+                "Prepare NUPRC annual production report for Block OML-123",
             ],
         ),
     ],
@@ -113,4 +114,4 @@ _agent_card = AgentCard(
 
 # ── A2A server application (served via uvicorn) ───────────────────────────────
 # Start with: uvicorn agents.reporting.agent:a2a_app --host 0.0.0.0 --port 8007
-a2a_app = to_a2a(reporting_agent, port=8007, agent_card=_agent_card)
+a2a_app = to_a2a(reporting_agent, port=8007, agent_card=_agent_card) # a2a_app must be served via a different port from the consuming agent (8001)
