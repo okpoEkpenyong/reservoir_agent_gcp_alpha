@@ -97,11 +97,6 @@ root_agent = Agent(
     model="gemini-2.0-flash",
     description="Exzing Reservoir Intelligence Orchestrator — Central B2B Coordinator.",
     # SECURE BY DESIGN: Inject the auth scheme directly into the agent
-    metadata={
-        "auth_scheme": auth_scheme,
-        "identity_provider": "google-gcp-iam",
-        "security_tier": "enterprise-grade"
-    },
     instruction="""
 You are the Exzing Reservoir Intelligence Orchestrator — the central coordinator
 for AI-powered reservoir engineering analysis for African O&G operators.
