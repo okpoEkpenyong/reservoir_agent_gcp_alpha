@@ -88,6 +88,7 @@ ALLOWED_ORIGINS = [
     "http://localhost",
     "http://localhost:8001",
     "http://localhost:8007",
+    "http://localhost:8008",
     "http://localhost:3000",
     "*",
 ]

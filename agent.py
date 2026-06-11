@@ -26,12 +26,16 @@ Intelligence:
 """
 
 import os
-from google.adk import Agent
+#from google.adk import Agent
+from google.adk.agents.llm_agent import Agent
 from google.genai import types
 
 # 1. IMPORT REMOTE A2A LOGIC
 from google.adk.agents.remote_a2a_agent import AGENT_CARD_WELL_KNOWN_PATH
 from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+
+from google.adk.auth.credential_manager import CredentialManager
+from google.adk.integrations.agent_identity import GcpAuthProvider, GcpAuthProviderScheme
 
 # 2. LOCAL TECHNICAL AGENTS (These stay local for performance)
 from agents.simulation_qc.agent import simulation_qc_agent
@@ -39,6 +43,11 @@ from agents.production_analyst.agent import production_analyst_agent
 #from agents.reporting.agent import reporting_agent
 
 from tools.reservoir_tools import bulk_dca_analysis, qc_eclipse_deck, generate_swof_table, format_engineering_context
+
+
+# --- 1. AGENT IDENTITY REGISTRATION ---
+# Register the official Google Cloud Auth Provider
+CredentialManager.register_auth_provider(GcpAuthProvider())
 
 # Attach tools to the specialized sub-agents
 production_analyst_agent.tools = [bulk_dca_analysis]
@@ -49,8 +58,22 @@ production_analyst_agent.tools = [generate_swof_table] # Or shared among tools
 
 # 3. REMOTE ENTERPRISE AGENTS (The A2A Story)
 # We define these via URLs to prove Interoperability
-REPORTING_URL = os.getenv("REPORTING_URL", "http://localhost:8001")
-FACILITY_URL = os.getenv("FACILITY_URL", "http://localhost:8007")
+REPORTING_URL = os.getenv("REPORTING_URL", "http://localhost:8007")
+FACILITY_URL = os.getenv("FACILITY_URL", "http://localhost:8008")
+
+# The callback URI on your live domain
+CONTINUE_URI = "https://gcpagent.exzing.com/validateAgentIdentity"
+
+# Fetch project details from environment (set in your cloudbuild.yaml)
+PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT", "fire-victory--a1")
+LOCATION = os.getenv("GOOGLE_LOCATION", "us-central1")
+
+# Create the formal Auth Scheme. 
+# This resource name represents our Agent's 'Passport' in GCP.
+auth_scheme = GcpAuthProviderScheme(
+    name=f"projects/{PROJECT_ID}/locations/{LOCATION}/connectors/exzing-orchestrator-identity",
+    continue_uri=CONTINUE_URI
+)
 
 # Reporting Agent (Your Internal Service)
 reporting_agent_remote = RemoteA2aAgent(

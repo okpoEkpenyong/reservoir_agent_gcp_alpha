@@ -73,9 +73,9 @@ Critical rules:
     tools=[format_engineering_context],
 )
 
-# http://localhost:8001/.well-known/agent-card.json
+# http://localhost:8007/.well-known/agent-card.json
 
-REPORTING_URL = os.getenv("REPORTING_URL", "http://localhost:8001")
+REPORTING_URL = os.getenv("REPORTING_URL", "http://localhost:8007")
 
 # ── A2A Agent Card ────────────────────────────────────────────────────────────
 # Explicit agent card for enterprise discovery and integration
