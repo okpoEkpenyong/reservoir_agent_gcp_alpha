@@ -49,14 +49,14 @@ production_analyst_agent.tools = [generate_swof_table] # Or shared among tools
 
 # 3. REMOTE ENTERPRISE AGENTS (The A2A Story)
 # We define these via URLs to prove Interoperability
-BASE_URL = os.getenv("BASE_URL", "http://localhost:8001")
+REPORTING_URL = os.getenv("REPORTING_URL", "http://localhost:8001")
 FACILITY_URL = os.getenv("FACILITY_URL", "http://localhost:8007")
 
 # Reporting Agent (Your Internal Service)
 reporting_agent_remote = RemoteA2aAgent(
     name="exzing_reporting_agent",
     description="Enterprise specialist for SPE-PRMS reporting and executive summaries.",
-    agent_card=f"{BASE_URL}/a2a/reporting{AGENT_CARD_WELL_KNOWN_PATH}",
+    agent_card=f"{REPORTING_URL}/a2a/reporting{AGENT_CARD_WELL_KNOWN_PATH}",
     use_legacy=False
 )
 
