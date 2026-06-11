@@ -42,6 +42,8 @@ from agents.simulation_qc.agent import simulation_qc_agent
 from agents.production_analyst.agent import production_analyst_agent
 #from agents.reporting.agent import reporting_agent
 
+from google.adk.tools import google_search
+
 from tools.reservoir_tools import bulk_dca_analysis, qc_eclipse_deck, generate_swof_table, format_engineering_context
 
 
@@ -133,6 +135,7 @@ Zero Data Retention: No data is stored beyond this session.
         reporting_agent_remote,    # Now a Remote Agent
         corporate_facility_agent   # The Challenge-required A2A Agent
     ],
+    tools=[google_search],
     generate_content_config=types.GenerateContentConfig(
         safety_settings=[
             types.SafetySetting(
