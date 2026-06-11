@@ -1,4 +1,4 @@
-# ── cloudbuild.yaml — Exzing Triple-Agent (A2A) Production CI/CD ───────────────
+# ── cloudbuild.yaml — Final Submission Build (Agent Identity & A2A) ───────────
 substitutions:
   _REGION: us-central1
   _REPO: reservoir-agent-gcp-alpha
@@ -13,7 +13,7 @@ substitutions:
   _CORP_IMAGE: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_CORP_SERVICE}
 
 steps:
-  # ── 1. Build All Images ──────────────────────────────────────────────────
+  # ── 1. Build All Three Images ──────────────────────────────────────────────
   - name: gcr.io/cloud-builders/docker
     id: build-orchestrator
     args: ['build', '--tag=${_IMAGE}:${SHORT_SHA}', '--tag=${_IMAGE}:latest', '--cache-from=${_IMAGE}:latest', '.']
@@ -26,7 +26,7 @@ steps:
     id: build-corporate
     args: ['build', '--tag=${_CORP_IMAGE}:${SHORT_SHA}', '--tag=${_CORP_IMAGE}:latest', '-f', 'Dockerfile.corporate', '.']
 
-  # ── 2. Push Individual Images (Fixes "push-all" error) ─────────────────────
+  # ── 2. Push Individual Images ────────────────────────────────────────────
   - name: gcr.io/cloud-builders/docker
     id: push-orchestrator
     args: ['push', '--all-tags', '${_IMAGE}']
@@ -42,15 +42,15 @@ steps:
     args: ['push', '--all-tags', '${_CORP_IMAGE}']
     waitFor: ['build-corporate']
 
-  # ── 3. Deploy Reporting Sub-Agent (ADK + Agent Identity) ──────────────────
+  # ── 3. Deploy Reporting Sub-Agent (ADK + Identity) ───────────────────────
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: deploy-reporting
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        pip install "google-cloud-aiplatform[adk,agent_engines]"
-        adk deploy cloud_run \
+        pip install "google-cloud-aiplatform[adk,agent_engines]" --break-system-packages
+        python3 -m google.adk.cli.main deploy cloud_run \
           --service-name=${_REPORTING_SERVICE} \
           --region=${_REGION} \
           --image=${_REPORTING_IMAGE}:${SHORT_SHA} \
@@ -59,15 +59,15 @@ steps:
           --set-env-vars=GOOGLE_PROJECT_ID=${PROJECT_ID},GOOGLE_LOCATION=${_REGION},GOOGLE_GENAI_USE_VERTEXAI=TRUE,GEMINI_MODEL=gemini-2.5-flash
     waitFor: ['push-reporting']
 
-  # ── 4. Deploy Corporate Facility Sub-Agent (ADK + Agent Identity) ──────────
+  # ── 4. Deploy Corporate Sub-Agent (ADK + Identity) ────────────────────────
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: deploy-corporate
     entrypoint: 'bash'
     args:
       - '-c'
       - |
-        pip install "google-cloud-aiplatform[adk,agent_engines]"
-        adk deploy cloud_run \
+        pip install "google-cloud-aiplatform[adk,agent_engines]" --break-system-packages
+        python3 -m google.adk.cli.main deploy cloud_run \
           --service-name=${_CORP_SERVICE} \
           --region=${_REGION} \
           --image=${_CORP_IMAGE}:${SHORT_SHA} \
@@ -83,8 +83,8 @@ steps:
     args:
       - '-c'
       - |
-        pip install "google-cloud-aiplatform[adk,agent_engines]"
-        adk deploy cloud_run \
+        pip install "google-cloud-aiplatform[adk,agent_engines]" --break-system-packages
+        python3 -m google.adk.cli.main deploy cloud_run \
           --service-name=${_SERVICE} \
           --region=${_REGION} \
           --image=${_IMAGE}:${SHORT_SHA} \
@@ -94,13 +94,12 @@ steps:
           --set-secrets=GOOGLE_API_KEY=exzing-gemini-key:latest,GROQ_API_KEY=exzing-groq-key:latest,AZURE_OPENAI_KEY=exzing-azure-key:latest,OPENROUTER_OPENAI_KEY=exzing-openrouter-key:latest,AZURE_OPENAI_API_KEY=exzing-litellm-azure-key:latest,CONTENT_SAFETY_KEY=exzing-content-safety-key:latest
     waitFor: ['push-orchestrator', 'deploy-reporting', 'deploy-corporate']
 
-# ── Image Artifacts ──────────────────────────────────────────────────────────
+# ── Metadata ──────────────────────────────────────────────────────────────────
 images:
   - ${_IMAGE}:latest
   - ${_REPORTING_IMAGE}:latest
   - ${_CORP_IMAGE}:latest
 
-# ── Deployment Options ────────────────────────────────────────────────────────
 options:
   logging: CLOUD_LOGGING_ONLY
   machineType: E2_HIGHCPU_8
