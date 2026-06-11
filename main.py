@@ -334,11 +334,6 @@ from agents.reporting.agent import a2a_app
 app.mount("/a2a/reporting", a2a_app)  
 
 
-# -- MOUNT THE REPORTING A2A AGENT ---
-# Ensure we are mounting the 'a2a_app' (the result of to_a2a), not just the agent object.
-from agents.reporting.agent import a2a_app
-app.mount("/a2a/reporting", a2a_app)
-
 # 2. Serve the React app for the root URL
 @app.get("/")
 async def serve_spa():

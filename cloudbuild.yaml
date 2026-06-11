@@ -1,16 +1,19 @@
-# ── cloudbuild.yaml — Exzing Multi-Agent (A2A) CI/CD ───────────────────────────
+# ── cloudbuild.yaml — Exzing Triple-Agent (A2A) CI/CD ───────────────────────────
 substitutions:
   _REGION: us-central1
   _REPO: reservoir-agent-gcp-alpha
-  # Main Orchestrator Properties
+  # 1. Orchestrator
   _SERVICE: exzing-reservoir-agent
   _IMAGE: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_SERVICE}
-  # Reporting Agent Properties
+  # 2. Reporting Agent
   _REPORTING_SERVICE: exzing-reporting-agent
   _REPORTING_IMAGE: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_REPORTING_SERVICE}
+  # 3. Corporate Agent (NEW)
+  _CORP_SERVICE: exzing-corporate-agent
+  _CORP_IMAGE: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_CORP_SERVICE}
 
 steps:
-  # ── 1. Build Both Images ──────────────────────────────────────────────────
+  # ── 1. Build All Three Images ──────────────────────────────────────────────
   - name: gcr.io/cloud-builders/docker
     id: build-orchestrator
     args: ['build', '--tag=${_IMAGE}:${SHORT_SHA}', '--tag=${_IMAGE}:latest', '--cache-from=${_IMAGE}:latest', '.']
@@ -19,7 +22,11 @@ steps:
     id: build-reporting
     args: ['build', '--tag=${_REPORTING_IMAGE}:${SHORT_SHA}', '--tag=${_REPORTING_IMAGE}:latest', '-f', 'Dockerfile.reporting', '.']
 
-  # ── 2. Push Both to Artifact Registry ─────────────────────────────────────
+  - name: gcr.io/cloud-builders/docker
+    id: build-corporate
+    args: ['build', '--tag=${_CORP_IMAGE}:${SHORT_SHA}', '--tag=${_CORP_IMAGE}:latest', '-f', 'Dockerfile.corporate', '.']
+
+  # ── 2. Push All to Artifact Registry ─────────────────────────────────────
   - name: gcr.io/cloud-builders/docker
     id: push-images
     args: ['push', '--all-tags', '${_IMAGE}']
@@ -30,7 +37,12 @@ steps:
     args: ['push', '--all-tags', '${_REPORTING_IMAGE}']
     waitFor: ['build-reporting']
 
-  # ── 3. Deploy Reporting Agent (A2A Sub-agent) ──────────────────────────────
+  - name: gcr.io/cloud-builders/docker
+    id: push-corporate
+    args: ['push', '--all-tags', '${_CORP_IMAGE}']
+    waitFor: ['build-corporate']
+
+  # ── 3. Deploy Reporting Agent (A2A Port 8007) ──────────────────────────────
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     id: deploy-reporting
     entrypoint: gcloud
@@ -48,7 +60,25 @@ steps:
       - --set-secrets=GOOGLE_API_KEY=exzing-gemini-key:latest
     waitFor: ['push-reporting']
 
-  # ── 4. Deploy Orchestrator (Linked to Reporting Agent) ─────────────────────
+  # ── 4. Deploy Corporate Facility Agent (A2A Port 8008) ──────────────────────
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    id: deploy-corporate
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - ${_CORP_SERVICE}
+      - --image=${_CORP_IMAGE}:${SHORT_SHA}
+      - --region=${_REGION}
+      - --platform=managed
+      - --allow-unauthenticated
+      - --port=8008
+      - --service-account=45991959818-compute@developer.gserviceaccount.com
+      - --set-env-vars=GOOGLE_PROJECT_ID=${PROJECT_ID},GOOGLE_LOCATION=${_REGION},GOOGLE_GENAI_USE_VERTEXAI=TRUE,GEMINI_MODEL=gemini-2.5-flash
+      - --set-secrets=GOOGLE_API_KEY=exzing-gemini-key:latest
+    waitFor: ['push-corporate']
+
+  # ── 5. Deploy Orchestrator (Linked to both Sub-agents) ───────────────────
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk
     id: deploy-orchestrator
     entrypoint: gcloud
@@ -64,8 +94,8 @@ steps:
       - --cpu=2
       - --port=8001
       - --service-account=45991959818-compute@developer.gserviceaccount.com
-      # LINKING THE TWO SERVICES + ALL PRODUCTION ENV VARS
-      - --set-env-vars=REPORTING_AGENT_URL=https://reporting.exzing.com/a2a,GOOGLE_PROJECT_ID=${PROJECT_ID},GOOGLE_LOCATION=${_REGION},GOOGLE_GENAI_USE_VERTEXAI=TRUE,GEMINI_MODEL=gemini-2.5-flash,AZURE_API_VERSION=2025-01-01-preview,AZURE_API_BASE=https://eastus.api.cognitive.microsoft.com/openai/deployments/gpt-5-main/chat/completions?api-version=2025-01-01-preview,AZURE_OPENAI_ENDPOINT=https://eastus.api.cognitive.microsoft.com/openai/deployments/gpt-5-main/chat/completions?api-version=2025-01-01-preview
+      # LINKING ALL THREE SERVICES + ALL PRODUCTION ENV VARS
+      - --set-env-vars=REPORTING_URL=https://reporting.exzing.com/a2a,FACILITY_URL=https://corporate.exzing.com/a2a,GOOGLE_PROJECT_ID=${PROJECT_ID},GOOGLE_LOCATION=${_REGION},GOOGLE_GENAI_USE_VERTEXAI=TRUE,GEMINI_MODEL=gemini-2.5-flash,AZURE_API_VERSION=2025-01-01-preview,AZURE_API_BASE=https://eastus.api.cognitive.microsoft.com/openai/deployments/gpt-5-main/chat/completions?api-version=2025-01-01-preview,AZURE_OPENAI_ENDPOINT=https://eastus.api.cognitive.microsoft.com/openai/deployments/gpt-5-main/chat/completions?api-version=2025-01-01-preview
       # ALL SECRETS
       - --set-secrets=GOOGLE_API_KEY=exzing-gemini-key:latest
       - --set-secrets=GROQ_API_KEY=exzing-groq-key:latest
@@ -73,13 +103,15 @@ steps:
       - --set-secrets=OPENROUTER_OPENAI_KEY=exzing-openrouter-key:latest
       - --set-secrets=AZURE_OPENAI_API_KEY=exzing-litellm-azure-key:latest
       - --set-secrets=CONTENT_SAFETY_KEY=exzing-content-safety-key:latest
-    waitFor: ['push-images', 'deploy-reporting']
+    waitFor: ['push-images', 'deploy-reporting', 'deploy-corporate']
 
 images:
   - ${_IMAGE}:${SHORT_SHA}
   - ${_IMAGE}:latest
   - ${_REPORTING_IMAGE}:${SHORT_SHA}
   - ${_REPORTING_IMAGE}:latest
+  - ${_CORP_IMAGE}:${SHORT_SHA}
+  - ${_CORP_IMAGE}:latest
 
 options:
   logging: CLOUD_LOGGING_ONLY

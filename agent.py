@@ -1,26 +1,42 @@
+
 """
-OrchestratorAgent — Root ADK agent for Exzing Reservoir Workstation (GCP Edition)
+Exzing Reservoir Orchestrator — Enterprise A2A Edition (Track 3)
 
 Architecture:
-  OrchestratorAgent (this file)
-    ├── simulation_qc_agent     (local sub-agent — ECLIPSE/OPM QC)
-    ├── production_analyst_agent (local sub-agent — DCA/EUR/RelPerm)
-    └── RemoteA2aAgent          (remote — Exzing Reporting Agent via A2A)
+  Exzing Orchestrator (Root Agent)
+    ├── Local Specialists:
+    │   ├── simulation_qc_agent      (Internal — ECLIPSE/OPM Syntax & QC)
+    │   └── production_analyst_agent  (Internal — Physics-Grounded DCA & EUR Math)
+    └── Remote A2A Services (Marketplace-Ready):
+        ├── exzing_reporting_agent    (Remote A2A — SPE-PRMS Executive Reporting)
+        └── corporate_facility_agent  (Remote A2A — Building Logistics & HVAC Optimization)
 
-The orchestrator routes user requests to the correct specialist agent,
-collects results, and coordinates with the remote reporting agent for
-management-ready output.
+Description:
+  This orchestrator serves as the 'Concierge' for the Exzing ecosystem. Following 
+  Google's A2A protocol, it decouples engineering logic from enterprise services. 
+  
+  B2B Interoperability Case:
+  Demonstrates seamless coordination between an Energy Agent and a Corporate HR/Facility 
+  Agent to anticipate building occupancy spikes during technical reviews, enabling 
+  proactive war-room booking and pre-cooling (HVAC) optimization.
 
-Powered exclusively by Gemini 2.5 Flash.
+Intelligence: 
+  Powered by Gemini 2.0/2.5 reasoning engines via Vertex AI.
+  Refactored for Google Cloud Marketplace and Enterprise interoperability.
 """
 
 import os
 from google.adk import Agent
-#from google.adk.agents import RemoteA2aAgent
+from google.genai import types
 
+# 1. IMPORT REMOTE A2A LOGIC
+from google.adk.agents.remote_a2a_agent import AGENT_CARD_WELL_KNOWN_PATH
+from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+
+# 2. LOCAL TECHNICAL AGENTS (These stay local for performance)
 from agents.simulation_qc.agent import simulation_qc_agent
 from agents.production_analyst.agent import production_analyst_agent
-from agents.reporting.agent import reporting_agent
+#from agents.reporting.agent import reporting_agent
 
 from tools.reservoir_tools import bulk_dca_analysis, qc_eclipse_deck, generate_swof_table, format_engineering_context
 
@@ -28,57 +44,74 @@ from tools.reservoir_tools import bulk_dca_analysis, qc_eclipse_deck, generate_s
 production_analyst_agent.tools = [bulk_dca_analysis]
 simulation_qc_agent.tools = [qc_eclipse_deck]
 production_analyst_agent.tools = [generate_swof_table] # Or shared among tools
-reporting_agent.tools = [format_engineering_context]
+#reporting_agent.tools = [format_engineering_context]
 
-# ── Root Orchestrator Agent ───────────────────────────────────────────────────
+
+# 3. REMOTE ENTERPRISE AGENTS (The A2A Story)
+# We define these via URLs to prove Interoperability
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8001")
+FACILITY_URL = os.getenv("FACILITY_URL", "http://localhost:8007")
+
+# Reporting Agent (Your Internal Service)
+reporting_agent_remote = RemoteA2aAgent(
+    name="exzing_reporting_agent",
+    description="Enterprise specialist for SPE-PRMS reporting and executive summaries.",
+    agent_card=f"{BASE_URL}/a2a/reporting{AGENT_CARD_WELL_KNOWN_PATH}",
+    use_legacy=False
+)
+
+# Corporate Facility Agent (The "Challenge" Use Case)
+corporate_facility_agent = RemoteA2aAgent(
+    name="corporate_facility_manager",
+    description="Enterprise agent for building logistics, occupancy spikes, and HVAC.",
+    agent_card=f"{FACILITY_URL}/a2a/corporate_facility_agent{AGENT_CARD_WELL_KNOWN_PATH}",
+    use_legacy=False
+)
+
+# 4. ROOT ORCHESTRATOR
 root_agent = Agent(
     name="exzing_reservoir_orchestrator",
-    model="gemini-2.5-flash",
-    description=(
-        "Exzing Reservoir Intelligence Orchestrator. "
-        "The primary entry point for all reservoir engineering AI tasks. "
-        "Routes requests to specialist sub-agents and coordinates "
-        "multi-agent workflows for comprehensive field development analysis."
-    ),
+    model="gemini-2.0-flash",
+    description="Exzing Reservoir Intelligence Orchestrator — Central B2B Coordinator.",
     instruction="""
 You are the Exzing Reservoir Intelligence Orchestrator — the central coordinator
 for AI-powered reservoir engineering analysis for African O&G operators.
 
-You manage a team of specialist agents:
+You manage a team of local specialist agents and remote enterprise agents:
 
-1. simulation_qc_agent
-   - Use for: ECLIPSE/OPM deck QC, simulator crash diagnosis, keyword validation
-   - Trigger when: user provides a .DATA snippet, error log, or asks about simulation issues
+--- LOCAL SPECIALISTS ---
+1. simulation_qc_agent: Use for ECLIPSE/OPM deck syntax and simulator crashes.
+2. production_analyst_agent: Use for DCA math, EUR estimates, and RelPerm generation.
 
-2. production_analyst_agent
-   - Use for: decline curve analysis (DCA), EUR estimation, production anomaly detection,
-     relative permeability table generation
-   - Trigger when: user provides production rates, asks about EUR/reserves, or needs RelPerm
+--- REMOTE A2A SERVICES ---
+3. exzing_reporting_agent: 
+   - Use for: Management summaries and SPE-PRMS compliance.
+   - Trigger: After a technical analysis is done, hand off to this agent to create a 'Board Report'.
 
-3. reporting_agent_remote (via A2A)
-   - Use for: generating management-ready executive summaries and compliance reports
-   - Trigger when: user asks for a "report", "summary", "board presentation", or
-     "executive overview" of analysis results
-   - Always call this AFTER simulation_qc_agent or production_analyst_agent has
-     completed its analysis — pass the results to this agent for summarisation
+4. corporate_facility_manager:
+   - Use for: Boardroom bookings and pre-cooling for technical reviews.
+   - Trigger: When a user schedules a 'Simulation Review' or needs a 'War Room'.
+   - Context: Anticipate occupancy spikes during these meetings and ask this agent to 'pre-cool' the room.
 
-Workflow rules:
-- For complex requests (e.g. "analyse this field and give me a board report"):
-  1. Route technical analysis to the appropriate specialist agent
-  2. Pass the specialist's findings to reporting_agent for the final summary
-- For simple single-step requests (e.g. "QC this deck"), route directly to the
-  specialist agent without calling reporting_agent_remote
-- Always confirm Human-in-the-Loop (HITL) sign-off before any output is exported
-  for regulatory or investment purposes
-- Maintain Zero Data Retention: remind users that no data is stored beyond this session
+WORKFLOW:
+1. Handle the technical request via a local specialist.
+2. Coordinate the business output via the reporting_agent.
+3. Coordinate the logistics (Room/HVAC) via the corporate_facility_manager.
 
-Tone: Professional, technically precise, never condescending.
-Context: Your users are reservoir engineers and geologists at O&G companies.
-         They understand technical terminology. Do not over-explain basics.
+Zero Data Retention: No data is stored beyond this session.
 """,
     sub_agents=[
         simulation_qc_agent,
         production_analyst_agent,
-        reporting_agent,
+        reporting_agent_remote,    # Now a Remote Agent
+        corporate_facility_agent   # The Challenge-required A2A Agent
     ],
+    generate_content_config=types.GenerateContentConfig(
+        safety_settings=[
+            types.SafetySetting(
+                category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+                threshold=types.HarmBlockThreshold.OFF,
+            ),
+        ]
+    ),
 )

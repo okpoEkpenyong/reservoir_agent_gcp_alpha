@@ -11,8 +11,15 @@ reporting agent can call the Exzing Reporting Agent to transform raw
 engineering data into board-ready summaries, without requiring access
 to the full reservoir engineering workstation.
 
+Context: Exposing a remote agent (this reporting agent) via A2A: I have an agent. 
+How do I expose it so that other agents (example orchestrator/root and production agents)
+can use my agent via A2A? Through the a2a protocol, the root agent can call the
+this reporting agent remotely.
+
 Powered exclusively by Gemini 2.5 Flash and other user-selected models.
-Exposed via: to_a2a(reporting_agent, port=8007)
+Exposed via: to_a2a(reporting_agent, port=8007) and available online
+via https://reporting.exzing.com/.well-known/agent-card.json
+
 """
 
 from google.adk import Agent
@@ -69,8 +76,8 @@ Critical rules:
 # Explicit agent card for enterprise discovery and integration
 _agent_card = AgentCard(
     name="Exzing Executive Reporting Agent",
-    #url="https://gcpagent.exzing.com/a2a/reporting",
-    url="http://localhost:8001/a2a/reporting",
+    url="https://reporting.exzing.com/.well-known/agent-card.json",
+    #url="http://localhost:8001/a2a/reporting",
     description=(
         "Transforms reservoir engineering analysis outputs into "
         "management-ready executive summaries for African O&G operators. "
