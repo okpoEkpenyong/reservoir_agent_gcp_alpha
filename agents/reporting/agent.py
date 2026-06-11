@@ -72,12 +72,16 @@ Critical rules:
     tools=[format_engineering_context],
 )
 
+# http://localhost:8001/.well-known/agent-card.json
+
+REPORTING_URL = os.getenv("REPORTING_URL", "http://localhost:8001")
+
 # ── A2A Agent Card ────────────────────────────────────────────────────────────
 # Explicit agent card for enterprise discovery and integration
+#agent_card=f"{REPORTING_URL}/a2a/reporting{AGENT_CARD_WELL_KNOWN_PATH}",
 _agent_card = AgentCard(
     name="Exzing Executive Reporting Agent",
-    url="https://reporting.exzing.com/.well-known/agent-card.json",
-    #url="http://localhost:8001/a2a/reporting",
+    url=f"{REPORTING_URL}/.well-known/agent-card.json",
     description=(
         "Transforms reservoir engineering analysis outputs into "
         "management-ready executive summaries for African O&G operators. "
