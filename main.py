@@ -331,8 +331,20 @@ async def info():
 
 #  MOUNT THE REPORTING A2A AGENT ---
 # This makes the reporting agent discoverable at gcpagent.exzing.com/a2a/reporting
-from agents.reporting.agent import a2a_app
-app.mount("/a2a/reporting", a2a_app)  
+#from agents.reporting.agent import a2a_app
+#app.mount("/a2a/reporting", a2a_app)  
+
+# This tells FastAPI: "If the URL starts with /assets, look in the static/assets folder"
+static_dir = os.path.join(os.path.dirname(__file__), "static")
+assets_dir = os.path.join(static_dir, "assets")
+
+if os.path.exists(assets_dir):
+    app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+# 3. SERVE THE INDEX.HTML FOR THE ROOT
+@app.get("/", include_in_schema=False)
+async def serve_index():
+    return FileResponse(os.path.join(static_dir, "index.html"))
 
 
 # 2. Serve the React app for the root URL
