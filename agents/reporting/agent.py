@@ -27,6 +27,7 @@ from google.adk.a2a.utils.agent_to_a2a import to_a2a
 from a2a.types import AgentCard, AgentSkill, AgentCapabilities
 
 from tools.reservoir_tools import format_engineering_context
+import os
 
 # ── Agent definition ──────────────────────────────────────────────────────────
 reporting_agent = Agent(
