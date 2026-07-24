@@ -1027,7 +1027,6 @@ export function AssetPage() {
           </div>
         )}
 		
-		// After DCA analysis is shown...
 		{results && (
 		  <AgentActionBanner 
 			title="DCA Analysis Complete"

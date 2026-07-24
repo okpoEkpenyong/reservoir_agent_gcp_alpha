@@ -24,17 +24,17 @@ const CARDS = [
     icon: FileText,
     color: 'from-emerald-500/20 to-emerald-500/5 border-emerald-500/30',
     iconColor: 'text-emerald-400',
-    label: 'Reporting Agent',
-    sub: 'A2A · Board summaries',
+    label: 'RelPerm Agent',
+    sub: 'Relative Permeability',
     path: '/relperm',
   },
   {
     icon: GitMerge,
     color: 'from-violet-500/20 to-violet-500/5 border-violet-500/30',
     iconColor: 'text-violet-400',
-    label: 'Orchestrator',
-    sub: 'Routes all requests',
-    path: '/',
+    label: 'Flare Monitor',
+    sub: 'Monitor upstream flare',
+    path: '/flare',
   },
 ]
 

@@ -11,14 +11,18 @@
     "lint": "eslint src --ext ts,tsx"
   },
   "dependencies": {
+    "bootstrap": "^5.3.8",
     "clsx": "^2.1.1",
+    "firebase": "^12.16.0",
     "lucide-react": "^0.383.0",
     "papaparse": "^5.5.3",
     "react": "^18.3.0",
+    "react-bootstrap": "^2.10.10",
     "react-dom": "^18.3.0",
     "react-is": "^19.2.7",
     "react-markdown": "^9.0.1",
     "react-router-dom": "^6.24.0",
+    "react-social-icons": "^6.26.0",
     "recharts": "^3.8.1",
     "remark-gfm": "^4.0.0",
     "tailwind-merge": "^2.3.0"

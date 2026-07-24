@@ -32,19 +32,10 @@ export function LandingPage() {
 		  <h1 className="text-5xl font-display font-bold text-white tracking-tight">
             Exzing <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-emerald-400">Orchestrator</span>
           </h1>
-		    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full
-                bg-petroleum-900 border border-petroleum-700 text-xs text-petroleum-300 font-mono mb-2">
-                <Zap size={10} className="text-amber-400" />
-                 Powered by Google ADK + {modelDisplayName}
-            </div>
             <h1 className="font-display text-3xl font-bold text-white leading-tight">
                Reservoir Intelligence<br />
             <span className="text-petroleum-400">at your fingertips</span>
             </h1>
-          <p className="text-petroleum-400 text-lg max-w-2xl mx-auto leading-relaxed">
-            Frontier reservoir intelligence. Specialized agents for 
-            simulation QC, production optimization, and petrophysics.
-          </p>
         </div>
 
         {/* Suggestions only trigger navigation now */}

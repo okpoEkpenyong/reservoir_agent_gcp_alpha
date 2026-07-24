@@ -12,12 +12,14 @@ const MODELS = [
 
 
 const AGENTS = [
-  { id: 'orchestrator', label: 'Orchestrator', sub: 'Routes all requests', path: '/chat', Icon: GitMerge, color: 'text-violet-400' },
+  { id: 'home', label: 'Home', sub: 'Routes all requests', path: '/', Icon: GitMerge, color: 'text-violet-400' },
   { id: 'sim_qc', label: 'Simulation QC', sub: 'ECLIPSE / OPM decks', path: '/debug', Icon: Cpu, color: 'text-petroleum-400' },
   { id: 'prod', label: 'Asset Intelligence', sub: 'DCA · EUR · Portfolio', path: '/asset', Icon: BarChart2, color: 'text-amber-400' },
-  { id: 'relperm', label: 'RelPerm Agent', sub: 'Corey · SWOF · SGOF', path: '/relperm', Icon: FlaskConical, color: 'text-emerald-400' },
+  { id: 'relperm', label: 'Relative Permeability', sub: 'Corey · SWOF · SGOF', path: '/relperm', Icon: FlaskConical, color: 'text-emerald-400' },
   { id: 'audit', label: 'Governance & Audit', sub: 'ZDR Compliance', path: '/audit', Icon: Lock, color: 'text-slate-400' },
-  //{ id: 'reporting', label: 'Reporting Agent', sub: 'A2A · Executive summaries', Icon: FileText, color: 'text-emerald-400' },
+  { id: 'flare', label: 'Flare Optimisation', sub: 'Flare summaries', path: '/flare', Icon: FileText, color: 'text-emerald-400' },
+  { id: 'feedback', label: 'Contact Hub', sub: 'Share feedback', path: '/feedback', Icon: FileText, color: 'text-emerald-400' },
+
 
 ]
 
@@ -37,12 +39,13 @@ export function Sidebar({ onClear, selectedModel, onModelChange }: SidebarProps)
   const location = useLocation();
 
   return (
-    <aside className="w-64 flex-shrink-0 bg-gradient-to-b from-red-100 to-red-50 border-r border-petroleum-800 flex flex-col">
+	// Fix: ensure the aside itself is height-constrained
+    <aside className="w-64 h-screen flex-shrink-0 bg-gradient-to-b from-red-100 to-red-50 border-r border-petroleum-800 flex flex-col overflow-hidden">
       
       {/* Logo Section */}
       <div className="p-5 border-b border-petroleum-800 bg-petroleum-950">
         <div className="font-display font-bold text-xl text-white tracking-tight uppercase">Exzing</div>
-        <div className="text-[10px] text-petroleum-400 font-mono mt-0.5">Subsurface Intelligence Agent</div>
+        <div className="text-[10px] text-petroleum-400 font-mono mt-0.5">Subsurface Optimiser</div>
       </div>
       {/* Dynamic Model Selector */}
       <div className="p-4">

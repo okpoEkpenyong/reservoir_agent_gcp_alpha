@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+import "../node_modules/bootstrap/dist/js/bootstrap.bundle";
 import { Routes, Route , useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { Sidebar } from './components/layout/Sidebar'
 import { Header } from './components/layout/Header'
@@ -6,9 +8,13 @@ import { AssetPage } from './pages/AssetPage'
 import { LandingPage } from './pages/LandingPage'
 import { DebugPage } from './pages/DebugPage'
 import { RelPermPage } from './pages/RelPermPage'
+import { FeedbackPage } from './pages/FeedbackPage'
+import { FlareMonitorPage } from './pages/FlareMonitorPage'
 import { useChat } from './context/ChatContext'
 import { AssetProvider } from './context/AssetContext'; 
 import { DebugProvider } from './context/DebugContext';
+import { MessageProvider } from "./context/MessageContext";
+import Navbar from "./components/navbars/Navbar";
 
 
 export default function App() {
@@ -26,9 +32,9 @@ export default function App() {
   if (isLanding) {
     return (
       <div className="h-screen overflow-hidden bg-petroleum-950">
+	   	<Navbar />
         <Routes>
           <Route path="/*" element={<LandingPage />} />
-          <Route path="/chat" element={<LandingPage />} />
         </Routes>
 	    <Header
           sidebarOpen={sidebarOpen}
@@ -41,6 +47,7 @@ export default function App() {
   return (
     <AssetProvider>
       <DebugProvider>
+	   <MessageProvider>
         <div className="flex h-screen overflow-hidden bg-blue-50">
           
           {/* Overlay for mobile */}
@@ -77,11 +84,14 @@ export default function App() {
                 <Route path="/asset" element={<AssetPage />} />
                 <Route path="/debug" element={<DebugPage />} />
                 <Route path="/relperm" element={<RelPermPage />} />
+				<Route path="/flare" element={<FlareMonitorPage />} />
+				<Route path="/feedback" element={<FeedbackPage />} />
                 <Route path="/audit" element={<div className="p-10">Governance View</div>} />
               </Routes>
             </main>
           </div>
         </div>
+	   </MessageProvider>
       </DebugProvider>
     </AssetProvider>
   );

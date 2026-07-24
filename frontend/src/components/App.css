@@ -1,0 +1,292 @@
+:root {
+  --off-white: #fafafa;
+}
+.nav {
+  background-color: var(--off-white);
+  position: sticky;
+  top: 0px;
+  width: 100%;
+  height: 80px;
+  z-index: 1000;
+  box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.15);
+}
+
+#container {
+  position: relative;
+}
+
+.appbg {
+  background-color: #000000;
+}
+
+.nav-logo {
+  height: 50px;
+  width: 16x0px;
+  /* padding: 0rem -9rem; */
+}
+
+.navbar-custom {
+  background-color: goldenrod;
+}
+
+.navbar-custom-2 {
+  background-image: linear-gradient(90deg, #021c2b 50%, #021c2b, #021c2b,goldenrod );
+}  
+.navbar-custom-3 {
+  background-image: linear-gradient(90deg, #021c2b 0%, #021c2b, #021c2b, #021c2b );
+  /* background-color: #021c2b; */
+}  
+.contact-bg-image {
+   background-image: url("images/contact-bg.png");
+   background-repeat: no-repeat;
+   background-size: auto;
+   padding-top: 20
+   /* width: 250px; */
+   /* mslight from "../src/images/ms-light.png"; */
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+  color: #0a3d62;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+}
+
+.nav-logo:hover {
+  cursor: pointer;
+  /* background-color: green; */
+}
+
+.nav .nav-content {
+  max-width: 900px;
+  padding: 0rem 3rem;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+}
+
+.nav-item {
+  display: inline;
+  margin-left: 2rem;
+  color: antiquewhite;
+  text-decoration: none;
+  font-family: 'Princess Sofia', cursive;
+}
+
+.nav-item:hover {
+  color:#83D7FE;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+/* @media (prefers-reduced-motion: no-preference) {
+  .nav-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+} */
+
+.section-dark {
+  background: #333;
+  color: white;
+}
+
+.section-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px;
+}
+
+ul {
+  list-style-type: square;
+}
+
+.java {
+  text-shadow: 1px 1px black;
+  padding: 30px;
+  text-indent: 70vmin;
+  text-align: justify;
+  color:#10e621!important;
+}
+
+.javascript {
+  color:#10e621!important;
+  padding: 30px;
+  text-indent: 170vmin;
+  text-shadow: 1px 1px black;
+}
+.oge {
+  padding: 0px;
+  text-indent: 132vmin;
+  color: white;
+  text-shadow: 2px 2px 4px #000000;
+}
+.fa {
+  text-indent: 50vmin;
+  color: white;
+  text-shadow: 2px 2px 4px #000000;
+  padding: 30px;
+}
+.mb {
+  padding: 30px;
+  color: white;
+  text-shadow: 2px 2px 4px #000000;
+}
+
+.py {
+  color:#10e621!important;
+  text-indent: 130vmin;
+  padding: 30px;
+  text-shadow: 1px 1px black;
+}
+
+.wb {
+  color:#10e621!important;
+  text-shadow: 1px 1px black;
+  text-indent: 4vmin;
+}
+.contact {
+  font-size:3vw;
+  font-family: 'Princess Sofia', cursive;
+  text-shadow: 2px 2px rgba(0, 0, 0, 0.096);
+  padding: 1px;
+  text-align: justify;
+}
+
+.contact-map {
+  background-position: right;
+}
+
+.addr {
+  padding: 30px;
+}
+.title-color {
+color: #10e621!important;
+font-size:3vw;
+font-family: 'Princess Sofia', cursive;
+text-shadow: 2px 2px black;
+}
+
+.subtitle-color {
+  color:#241306!important;
+  font-size:2vw;
+  font-family: "Lucida Handwriting", Times, serif;
+}
+
+.subtext {
+  font-size:2vw;
+  font-family: 'Princess Sofia', cursive;
+  text-shadow: 2px 2px rgba(0, 0, 0, 0.096);
+  /* background-image: url("img/study.jpg"); */
+  padding: 20px;
+  text-align: justify;
+  min-height: 100vw;
+}
+
+.wwd {
+  padding: 30px;
+  font-family: 'Lucida Handwriting', cursive;
+  color:#10e621!important;
+  text-shadow: 1px 1px black;
+}
+
+.after-header {
+  font-family: 'Lucida Handwriting', cursive;
+  color:#10e621!important;
+  text-shadow: 1px 1px black;
+  padding: 0px;
+}
+
+.text-vsoft:hover {
+  font-family: 'Lucida Handwriting', cursive;
+  color:goldenrod!important;
+  text-shadow: 1px 1px black;
+
+  
+}
+/************************************************/
+
+.App {
+  text-align: center;
+  background-color: #34282f57;
+ 
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: rgb(22, 129, 230);
+  /* background-image: url("img/bg-pics.png"); */
+  background-position: left top;
+  background-attachment: fixed;
+  background-repeat: no-repeat round ;
+  background-size: 50%;
+  flex-direction: column;
+  min-height: 100vw;
+
+}
+
+.what-we-do {
+  background-color:#ffff;
+  /* background-image: url("img/vesoft_wwd.png"); */
+  background-position: right top;
+  background-attachment: fixed;
+  background-repeat: no-repeat round ;
+  background-size: 50%;
+  color: #241306!important;
+  font-size:2vw;
+  text-align: justify;
+  font-family: 'Princess Sofia', cursive;
+  min-height: 100vw;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.player-wrapper {
+  position: relative;
+  padding-top: 56.25% /* Player ratio: 100 / (1280 / 720) */
+}
+
+.react-player {
+  position: absolute;
+  top: 20;
+  left: 0;
+  /* height: 50%; */
+}
+
+.video-responsive {
+  overflow: hidden;
+  padding-bottom: 56.25%;
+  position: relative;
+  height: 0;
+}
+
+.video-responsive iframe {
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+}

@@ -1,0 +1,179 @@
+.App {
+  text-align: center;
+}
+
+.appLogo {
+  height: 10vmin;
+  width: 10vmin;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .appLogo {
+    animation: appLogoSpin 20s  infinite linear;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .appLogo {
+    width:100%;
+  }
+}
+@media only screen and (min-width: 768px) {
+  .appLogo {
+    width:70%;
+  }
+}
+
+.mainCard {
+  padding: 10% 5% 10% 5%;
+  min-height: 100vh;
+  background-color: red ;
+}
+
+@media only screen and (max-width: 768px) {
+  .mainCard {
+    /* min-height: 100vh; */
+    /* padding: 30% 5% 10% 5%; */
+    background-color: blue;
+  }
+}
+
+@media only screen and (max-width: 568px) {
+ .container {
+  padding:40% 5% 0% 5%; 
+ }
+}
+@media only screen and (min-width: 568px) {
+ .container {
+  padding:15% 5% 0% 5%; 
+ }
+}
+
+
+.imageBg {
+  background-image: linear-gradient(90deg, #021c2b 0%, #021c2b, #021c2b, #021c2b );
+}
+
+.container {
+  /* background-color: #131f38; */
+  min-height: 100vh;
+  flex-direction: row;
+  background-color: #131f38;
+  height: 100vh;
+  overflow-y: auto;
+  /* padding-top: 10%; */
+  /* text-align: calc(); */
+  /* padding:10% 5% 0% 5%;  */
+  /* color: aliceblue; */
+  /* text-align:justify; */
+  /* text-justify: inter-word; */
+  background-image: linear-gradient(90deg, #021c2b 0%, #021c2b, #021c2b, #021c2b );
+}
+.containerCard {
+  /* min-height: 100vh; */
+  padding: 10% 5% 10% 5%;
+  background-image: linear-gradient(90deg, #021c2b 0%, #021c2b, #021c2b, #021c2b );
+}
+.contactForm {
+  padding: 40% 5% 0% 5%; /**  top right bottom left  CW dir*/
+  background-color: #131f38;
+  min-height: 100vh;
+  text-align: calc();
+  background-image: linear-gradient(90deg, #021c2b 0%, #021c2b, #021c2b, #021c2b );
+
+  /* text-justify: kashida; */
+}
+.btnSubmit {
+  margin-left: 0%;
+  /* align-content: flex-end; */
+}
+
+.card {
+  background-color: #131f38;
+  color: rgb(197, 187, 187);
+  margin: 3%;
+  justify-content: center;
+}
+.contactFooter {
+  /* background-color: #a0afd1; */
+  color: white;
+  border-color: aliceblue;
+  /* border-top-right-radius: 40%; */
+}
+.footer {
+  background-color: #131f38;
+  min-height: 10vh;
+  color: aliceblue;
+  text-align: center;
+  padding: 10%;
+  background-image: linear-gradient(90deg, #021c2b 0%, #021c2b, #021c2b, #021c2b );
+ 
+}
+
+
+.appHeader {
+  background-color: #131f38;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color:#0cb3eb!important;
+  font-family: "Lucida Handwriting", Times, serif;
+  background-image: linear-gradient(90deg, #021c2b 0%, #021c2b, #021c2b, #021c2b );
+ 
+}
+
+.subtitles {
+  padding-bottom: 2%;
+  color:goldenrod!important;
+  text-align: left;
+  margin-left: 1% ;
+}
+.wego {
+  color:blanchedalmond;
+  text-align: center;
+}
+.exzingWords {
+  padding-top: 2%;
+  text-align: center;
+}
+.partnerWords {
+  padding-top: 2%;
+  color:blanchedalmond;
+  margin-left: 15%;
+  margin-right: 15%;
+  text-align: center;
+}
+.exzing {
+  color:goldenrod!important;
+}
+
+.appLink {
+  color: #61dafb;
+}
+
+.btnMoreInfo {
+  margin-top: 1rem !important;
+}
+
+.contactUs {
+  color:goldenrod!important;
+  padding-bottom: 10%;
+}
+
+/* The @keyframes rule specifies the animation code. 
+The animation is created by gradually changing from one set of CSS styles to another. */
+@keyframes appLogoSpin {
+  /* from {
+  
+    transform: translate(12px, 10%);;
+  }
+  to {
+    transform: translate(12px, -10%);;
+  } */
+}
+

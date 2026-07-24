@@ -1,0 +1,41 @@
+/* careful on the choice of the classnames. For e.g container will override bootstrap Containers */
+
+.nav {
+    background-color: var(--off-white);
+    position: sticky;
+    top: 0px;
+    width: 100%;
+    height: 80px;
+    z-index: 1000;
+    box-shadow: 0 4px 14px 0 rgba(0, 0, 0, 0.15);
+  }
+  
+  #container {
+    position: relative;
+  }
+  
+  .appbg {
+    background-color: #000000;
+  }
+  
+  .navlogo {
+    height: 10vmin;  /* great for viewport and responsiveness*/
+    height: 50px;
+  }
+  
+  .custom_navbar {
+    background-color: goldenrod;
+  }
+  
+  .custom_navbar2 {
+    /* height: 10vmin; */
+    background-image: linear-gradient(90deg, #021c2b 50%, #021c2b, #021c2b,goldenrod );
+  }  
+  .custom_navbar3{
+    background-image: linear-gradient(90deg, #021c2b 0%, #021c2b, #021c2b, #021c2b );
+    /* background-color: #021c2b; */
+  }  
+.navcontainer {
+    background-color: #131f38;
+    /* color:antiquewhite */
+}
