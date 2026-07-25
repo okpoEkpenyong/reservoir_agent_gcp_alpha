@@ -57,6 +57,8 @@ from typing import Annotated, Any
 from fastapi import APIRouter
 from tools.reservoir_tools import bulk_dca_analysis, qc_eclipse_deck, generate_swof_table
 from agents.reporting.agent import reporting_agent
+from routes.feedback import router as feedback_router
+
 
 # Verify the key is loaded (for debugging - remove later)
 api_key = os.getenv("GOOGLE_API_KEY")
@@ -69,6 +71,9 @@ else:
 # ── Logging ───────────────────────────────────────────────────────────────────
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Suppress noisy context detachment warnings from OpenTelemetry
+logging.getLogger("opentelemetry.context").setLevel(logging.CRITICAL)
 
 APP_NAME = getenv("APP_NAME", "exzing_reservoir_orchestrator")
 
@@ -101,6 +106,8 @@ app: FastAPI = get_fast_api_app(
     allow_origins=ALLOWED_ORIGINS,
     web=False,  # Disable the built-in ADK UI by setting to False for Production builds
 )
+
+app.include_router(feedback_router)
 
 # ── Custom API logic for Frontend ───────────────────────────────────────────
 
@@ -177,9 +184,9 @@ async def chat(
         new_model = LiteLlm(model=model_id)
         root_agent.model = new_model
         logger.info(f"Session {current_session_id} using model_id: {model_id}, root_agent_model: {new_model}")
-         # Also update sub-agents so the whole "team" uses the selected brain
-        for sub in root_agent.sub_agents:
-            sub.model = new_model
+        # Also update sub-agents so the whole "team" uses the selected brain
+        #for sub in root_agent.sub_agents:
+        #    sub = new_model
             
         logger.info(f"Team re-aligned to model: {model_id}")
     except Exception as e:
@@ -197,7 +204,7 @@ async def chat(
     new_message = Content(role="user", parts=[Part(text=prompt)])
     #content = types.Content(role='user', parts=[types.Part(text=query)])
     
-    logger.info("new_message:", new_message)
+    logger.info(f"new_message: {new_message}")
     final_msg = ""
     final_response_text = "Agent did not produce a final response." # Default
     

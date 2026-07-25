@@ -60,8 +60,8 @@ production_analyst_agent.tools = [generate_swof_table] # Or shared among tools
 
 # 3. REMOTE ENTERPRISE AGENTS (The A2A Story)
 # We define these via URLs to prove Interoperability
-REPORTING_URL = os.getenv("REPORTING_URL", "http://localhost:8007")
-FACILITY_URL = os.getenv("FACILITY_URL", "http://localhost:8008")
+#REPORTING_URL = os.getenv("REPORTING_URL", "http://localhost:8007")
+#FACILITY_URL = os.getenv("FACILITY_URL", "http://localhost:8008")
 
 # The callback URI on your live domain
 CONTINUE_URI = "https://gcpagent.exzing.com/validateAgentIdentity"
@@ -78,25 +78,25 @@ auth_scheme = GcpAuthProviderScheme(
 )
 
 # Reporting Agent (Your Internal Service)
-reporting_agent_remote = RemoteA2aAgent(
-    name="exzing_reporting_agent",
-    description="Enterprise specialist for SPE-PRMS reporting and executive summaries.",
-    agent_card=f"{REPORTING_URL}/a2a/reporting{AGENT_CARD_WELL_KNOWN_PATH}",
-    use_legacy=False
-)
+#reporting_agent_remote = RemoteA2aAgent(
+ #   name="exzing_reporting_agent",
+ #   description="Enterprise specialist for SPE-PRMS reporting and executive summaries.",
+ #   agent_card=f"{REPORTING_URL}/a2a/reporting{AGENT_CARD_WELL_KNOWN_PATH}",
+ #   use_legacy=False
+#)
 
 # Corporate Facility Agent (The "Challenge" Use Case)
-corporate_facility_agent = RemoteA2aAgent(
-    name="corporate_facility_manager",
-    description="Enterprise agent for building logistics, occupancy spikes, and HVAC.",
-    agent_card=f"{FACILITY_URL}/a2a/corporate_facility_agent{AGENT_CARD_WELL_KNOWN_PATH}",
-    use_legacy=False
-)
+#corporate_facility_agent = RemoteA2aAgent(
+#    name="corporate_facility_manager",
+#    description="Enterprise agent for building logistics, occupancy spikes, and HVAC.",
+#    agent_card=f"{FACILITY_URL}/a2a/corporate_facility_agent{AGENT_CARD_WELL_KNOWN_PATH}",
+#    use_legacy=False
+#)
 
 # 4. ROOT ORCHESTRATOR
 root_agent = Agent(
     name="exzing_reservoir_orchestrator",
-    model="gemini-2.0-flash",
+    model="gemini-2.5-flash",
     description="Exzing Reservoir Intelligence Orchestrator — Central B2B Coordinator.",
     # SECURE BY DESIGN: Inject the auth scheme directly into the agent
     instruction="""
@@ -132,10 +132,10 @@ Zero Data Retention: No data is stored beyond this session.
     sub_agents=[
         simulation_qc_agent,
         production_analyst_agent,
-        reporting_agent_remote,    # Now a Remote Agent
-        corporate_facility_agent   # The Challenge-required A2A Agent
+        #reporting_agent_remote,    # Now a Remote Agent
+        #corporate_facility_agent   # The Challenge-required A2A Agent
     ],
-    tools=[google_search],
+    #tools=[google_search],
     generate_content_config=types.GenerateContentConfig(
         safety_settings=[
             types.SafetySetting(
@@ -145,3 +145,14 @@ Zero Data Retention: No data is stored beyond this session.
         ]
     ),
 )
+
+
+#root_agent = Agent(
+#    name='web_search_agent',
+#    model=LiteLlm(model='gemini-2.5-flash', web_search_options={
+#        "search_context_size": "medium"  
+#    }),
+#    instruction=(
+#        'Use your tool to find information about the users prompt'
+#    ),
+#)
