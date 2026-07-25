@@ -1,18 +1,15 @@
-// Import the functions you need from the SDKs you need
 // firebase_config.ts
+
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 
-// web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL, // required for Realtime DB
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: "AIzaSyAMGpj92VVKtQQWZYcJGQksYFYZfwzNbXE",
+  authDomain: "exzingdb.firebaseapp.com",
+  databaseURL: "https://exzingdb-default-rtdb.firebaseio.com",
+  projectId: "exzingdb",
+  storageBucket: "exzingdb.appspot.com",
+  messagingSenderId: "478816800318",
+  appId: "1:478816800318:web:af95a9b473d45d5740cb6f",
 };
 
-export const app: FirebaseApp = getApps().length
-  ? getApp()
-  : initializeApp(firebaseConfig);
+export const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);

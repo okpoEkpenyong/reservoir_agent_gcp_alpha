@@ -5,6 +5,7 @@ substitutions:
   # 1. Orchestrator
   _SERVICE: exzing-reservoir-agent
   _IMAGE: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_SERVICE}
+  _VITE_API_URL: 'https://exzing-reservoir-agent-45991959818.us-central1.run.app'
   # 2. Reporting Agent (disabled — see agent.py, temporarily commented out)
   # _REPORTING_SERVICE: exzing-reporting-agent
   # _REPORTING_IMAGE: ${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/${_REPORTING_SERVICE}
@@ -16,8 +17,14 @@ steps:
   # ── 1. Build Orchestrator Image ──────────────────────────────────────────
   - name: gcr.io/cloud-builders/docker
     id: build-orchestrator
-    args: ['build', '--tag=${_IMAGE}:${SHORT_SHA}', '--tag=${_IMAGE}:latest', '--cache-from=${_IMAGE}:latest', '.']
-
+    args:
+      - 'build'
+      - '--tag=${_IMAGE}:${SHORT_SHA}'
+      - '--tag=${_IMAGE}:latest'
+      - '--cache-from=${_IMAGE}:latest'
+      - '--build-arg=VITE_API_URL=${_VITE_API_URL}'
+      - '.'
+      
   # - name: gcr.io/cloud-builders/docker
   #   id: build-reporting
   #   args: ['build', '--tag=${_REPORTING_IMAGE}:${SHORT_SHA}', '--tag=${_REPORTING_IMAGE}:latest', '-f', 'Dockerfile.reporting', '.']

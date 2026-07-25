@@ -2,6 +2,10 @@
 FROM node:18-slim AS frontend-builder
 WORKDIR /build
 
+ARG VITE_API_URL
+
+ENV VITE_API_URL=$VITE_API_URL
+
 # Copy only package files first to leverage Docker cache
 COPY frontend/package*.json ./
 RUN npm install
