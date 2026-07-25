@@ -31,8 +31,8 @@ from google.adk.agents.llm_agent import Agent
 from google.genai import types
 
 # 1. IMPORT REMOTE A2A LOGIC
-from google.adk.agents.remote_a2a_agent import AGENT_CARD_WELL_KNOWN_PATH
-from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
+#from google.adk.agents.remote_a2a_agent import AGENT_CARD_WELL_KNOWN_PATH
+#from google.adk.agents.remote_a2a_agent import RemoteA2aAgent
 
 from google.adk.auth.credential_manager import CredentialManager
 from google.adk.integrations.agent_identity import GcpAuthProvider, GcpAuthProviderScheme

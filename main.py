@@ -56,7 +56,7 @@ from os import getenv
 from typing import Annotated, Any
 from fastapi import APIRouter
 from tools.reservoir_tools import bulk_dca_analysis, qc_eclipse_deck, generate_swof_table
-from agents.reporting.agent import reporting_agent
+#from agents.reporting.agent import reporting_agent
 from routes.feedback import router as feedback_router
 
 
