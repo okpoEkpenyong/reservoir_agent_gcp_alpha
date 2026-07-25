@@ -208,20 +208,6 @@ const WellFilterBar = ({
   );
 };
 
-const CollapsibleCard_old = ({
-  icon, title, defaultOpen = true, count, children,
-}: {
-  icon: React.ReactNode; title: string; defaultOpen?: boolean; count?: string; children: React.ReactNode;
-}) => {
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
-      <SectionHeader icon={icon} title={title} open={open} onToggle={() => setOpen(o => !o)} count={count} />
-      {open && <div className="border-t border-slate-100">{children}</div>}
-    </div>
-  );
-};
-
 const CollapsibleCard = ({
   icon, title, defaultOpen = true, count, controls, children,
 }: {
@@ -613,32 +599,6 @@ const AbandonmentGauges = ({
 // ─────────────────────────────────────────────
 // COMPONENT: Input data preview table (always visible after load)
 // ─────────────────────────────────────────────
-const InputDataTable_old = ({ records }: { records: any[] }) => (
-  <div className="overflow-auto max-h-48 font-mono text-[10px]">
-    <table className="w-full">
-      <thead className="sticky top-0 bg-slate-50 border-b border-slate-100 text-slate-500">
-        <tr className="text-left">
-          <th className="p-2.5 font-bold uppercase text-[9px] tracking-wider">#</th>
-          <th className="p-2.5 font-bold uppercase text-[9px] tracking-wider">Field</th>
-          <th className="p-2.5 font-bold uppercase text-[9px] tracking-wider">Well</th>
-          <th className="p-2.5 font-bold uppercase text-[9px] tracking-wider">Rates (STB/D) ×{records[0]?.oil_rates?.length ?? '—'} pts</th>
-        </tr>
-      </thead>
-      <tbody>
-        {records.slice(0, 15).map((r: any, i: number) => (
-          <tr key={i} className="border-t border-slate-50 hover:bg-slate-50">
-            <td className="p-2 text-slate-300">{i}</td>
-            <td className="p-2 text-slate-500">{r.field}</td>
-            <td className="p-2 font-bold text-slate-800">{r.well_name}</td>
-            <td className="p-2 text-blue-600">
-              {(r.oil_rates ?? []).slice(0, 8).join(', ')}{r.oil_rates?.length > 8 ? ' …' : ''}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-);
 
 const InputDataTable = ({ records }: { records: any[] }) => {
   // Flatten grouped records back to row-per-date format

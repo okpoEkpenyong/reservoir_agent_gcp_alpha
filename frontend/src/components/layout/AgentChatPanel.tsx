@@ -19,7 +19,8 @@ export function AgentChatPanel({ isVisible }: { isVisible?: boolean }) {
   
   const location = useLocation();
   const pageKey = (location.pathname.replace('/', '') || 'global') as PageKey;
-  const messages = messagesByPage[pageKey];
+//  const messages = messagesByPage[pageKey];
+  const messages = messagesByPage[pageKey] ?? []; // fallback prevents the crash entirely
   const isEmpty = !messages || messages.length === 0
   
  
@@ -182,7 +183,8 @@ export function AgentChatPanel({ isVisible }: { isVisible?: boolean }) {
           />
 		  {!loading ? (
             <button 
-              type="submit" 
+              type="button" 
+			  onClick={handleSend}
               disabled={!input.trim()}
               className="absolute right-2 top-2 p-3 bg-red-600 hover:bg-red-500 disabled:bg-petroleum-800 text-white rounded-lg transition-all"
             >

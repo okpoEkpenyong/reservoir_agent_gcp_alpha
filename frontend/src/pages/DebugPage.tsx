@@ -155,7 +155,9 @@ Fixed code should be well written in normal ECLIPSE/OPM format. You can attach a
         </div>
       ) : (
         <div className="flex-1">
+		
           <AgentChatPanel isVisible={true} />
+		  {/**
 		      {isDiagnosisComplete && (
 				  <div className="pb-8">
 					<AgentActionBanner 
@@ -167,8 +169,10 @@ Fixed code should be well written in normal ECLIPSE/OPM format. You can attach a
 					  isLoading={loading}
 					  color="violet"
 					/>
+			  			
 				  </div>
 				)}
+				**/}
         </div>
       )}
     </div>

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useRef } from 'react';
 import { sendChatMessage } from '../services/api';
 import { Message } from '../types'
 
-export type PageKey = 'asset' | 'debug' | 'relperm' | 'global';
+export type PageKey = 'asset' | 'debug' | 'relperm' | 'flare' | 'audit' | 'global';
 
 interface ChatContextType {
   // Replace flat messages with a per-page map
@@ -20,7 +20,7 @@ const ChatContext = createContext<ChatContextType | null>(null);
 
 export function ChatProvider({ children }: { children: React.ReactNode }) {
   const [messagesByPage, setMessagesByPage] = useState<Record<PageKey, Message[]>>({
-    asset: [], debug: [], relperm: [], global: [],
+    asset: [], debug: [], relperm: [], flare: [], audit: [], global: [],
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -92,7 +92,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
       setMessagesByPage(prev => ({ ...prev, [page]: [] }));
       setSessionIdsByPage(prev => ({ ...prev, [page]: undefined }));
     } else {
-      setMessagesByPage({ asset: [], debug: [], relperm: [], global: [] });
+      setMessagesByPage({ asset: [], debug: [], relperm: [], flare: [], audit: [], global: [] });
       setSessionIdsByPage({});
     }
     setError(null);

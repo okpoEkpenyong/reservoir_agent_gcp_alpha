@@ -9,6 +9,7 @@ import { LandingPage } from './pages/LandingPage'
 import { DebugPage } from './pages/DebugPage'
 import { RelPermPage } from './pages/RelPermPage'
 import { FeedbackPage } from './pages/FeedbackPage'
+import { GovernanceAuditPage } from './pages/GovernanceAuditPage'
 import { FlareMonitorPage } from './pages/FlareMonitorPage'
 import { useChat } from './context/ChatContext'
 import { AssetProvider } from './context/AssetContext'; 
@@ -86,7 +87,7 @@ export default function App() {
                 <Route path="/relperm" element={<RelPermPage />} />
 				<Route path="/flare" element={<FlareMonitorPage />} />
 				<Route path="/feedback" element={<FeedbackPage />} />
-                <Route path="/audit" element={<div className="p-10">Governance View</div>} />
+                <Route path="/audit" element={<GovernanceAuditPage />} />
               </Routes>
             </main>
           </div>
